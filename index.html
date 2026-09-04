@@ -325,6 +325,25 @@
   }
   .done strong{font-weight:600;color:var(--ink-2);white-space:nowrap}
 
+  /* ---------- 참고 블록 (체크 항목 아님) ---------- */
+  .block.ref{background:var(--art-soft);border-color:var(--art);box-shadow:none}
+  .block.ref .bk-note{color:var(--ink)}
+  .ref-what{list-style:none;margin:16px 0 0;padding:0;display:flex;flex-direction:column;gap:1px;
+    background:var(--art);border:1px solid var(--art)}
+  .ref-what li{background:var(--surface);padding:11px 15px;display:grid;
+    grid-template-columns:8.5em 9em minmax(0,1fr);gap:14px;align-items:baseline;font-size:.89rem}
+  @media (max-width:640px){ .ref-what li{grid-template-columns:1fr;gap:3px} }
+  .ref-what b{font-weight:600;color:var(--ink-2);white-space:nowrap}
+  .ref-what strong{font-weight:600;color:var(--art)}
+  .ref-what span{color:var(--muted);font-size:.85rem}
+  .ref-how{margin:18px 0 0;padding-left:1.25em}
+  .ref-how li{font-size:.91rem;line-height:1.62;margin:0 0 8px}
+  .ref-how li:last-child{margin-bottom:0}
+  .ref-how b{font-weight:600;color:var(--ink-2)}
+  .ref-line{margin:18px 0 0;padding:12px 15px;background:var(--surface);
+    border-left:3px solid var(--art);font-size:.88rem}
+  .ref-line b{font-weight:600;color:var(--ink-2)}
+
   /* ---------- routine table ---------- */
   .tablewrap{overflow-x:auto;border:1px solid var(--rule);background:var(--surface)}
   table{border-collapse:collapse;width:100%;min-width:440px}
@@ -527,6 +546,43 @@
           32×32 캔버스에서는 손기술보다 판단(형태가 읽히는가, 색을 몇 개 쓸 것인가)이 전부라서, 그림을 못 그려도 몇 주면 쓸 만한 게 나옵니다.
           순서를 지키는 것이 중요합니다 — 색부터 손대면 안 늡니다.</p>
         <div class="ph-meter"><div class="px sm" data-px="p1"></div><span class="ph-frac lat" data-frac="p1"></span></div>
+
+        <div class="block ref">
+          <div class="bk-head"><span class="chip art">참고</span><h3>그릴 때 뭘 보고 그리나</h3></div>
+          <p class="bk-note">체크 항목이 아니라, 아래 넉 달 내내 옆에 두고 쓰는 방법입니다.
+            초보가 가장 많이 하는 실수가 처음부터 끝까지 <b>남의 픽셀아트만</b> 보는 것입니다.
+            그러면 그 사람이 내린 판단을 복사할 뿐, 판단하는 법은 늘지 않습니다.</p>
+
+          <ul class="ref-what">
+            <li><b>1-1 실루엣</b><strong>실제 사진</strong><span>물건의 진짜 형태를 알아야 뭘 버릴지 정할 수 있음</span></li>
+            <li><b>1-2 명암</b><strong>조명이 뚜렷한 사진</strong><span>빛이 실제로 어떻게 떨어지는지는 사진에만 있음</span></li>
+            <li><b>1-3 색</b><strong>남의 픽셀아트</strong><span>16색으로 색을 배분하는 법은 픽셀아트에서만 배움</span></li>
+            <li><b>1-4 애니메이션</b><strong>실사 영상 + 스프라이트</strong><span>움직임은 영상에서, 몇 프레임으로 줄일지는 게임에서</span></li>
+          </ul>
+
+          <ol class="ref-how">
+            <li><b>사진을 32픽셀로 줄여서 보세요.</b> 가장 실용적인 요령입니다. 축소하면 픽셀로 옮겼을 때
+              뭐가 남고 뭐가 사라지는지 그대로 보입니다 — <b>사라지는 건 안 그려도 되는 것</b>입니다.</li>
+            <li><b>한 장만 보지 마세요.</b> 같은 물건을 3~4장 띄웁니다. 한 장만 보면 그 사진의 각도와
+              그림자까지 복사됩니다. 여러 장에서 공통으로 보이는 것이 실루엣으로 남길 것입니다.</li>
+            <li><b>Aseprite의 참고 레이어를 쓰세요.</b> <code>Layer → New → New Reference Layer…</code>로
+              사진을 깔면 내보낼 때 자동으로 빠집니다. 단 <b>대고 그리는 건 처음 5개까지만</b> —
+              계속 대고 그리면 눈이 늘지 않습니다.</li>
+            <li><b>눈을 가늘게 뜨고 보세요.</b> 참고를 볼 때도 똑같습니다. 디테일이 날아가고 남는
+              덩어리가 그릴 전부입니다.</li>
+          </ol>
+
+          <p class="bk-note" style="margin-top:18px">찾는 곳 — 사진은 구글 이미지에
+            <code>product photo</code>나 <code>white background</code>를 붙여 검색.
+            픽셀아트는 <a href="https://lospec.com/gallery">Lospec 갤러리</a>와
+            <a href="https://itch.io/game-assets/free/tag-pixel-art">itch.io 무료 에셋 팩</a>.
+            에셋 팩을 하나 받아두면 실제 게임에 들어가는 스프라이트의 밀도가 감으로 잡힙니다.</p>
+
+          <p class="ref-line"><b>저작권 선</b> — 연습은 뭘 보고 그려도 자유, 남에게 내놓거나 게임에
+            넣는 건 직접 그린 것만. 참고를 보는 것 자체에 죄책감을 가질 필요는 없습니다.
+            프로도 전부 참고를 봅니다. 안 보고 그리는 건 실력이 아니라 기억력이고, 기억은 참고를
+            수백 번 본 뒤에 생깁니다.</p>
+        </div>
 
         <div class="block">
           <div class="bk-head"><span class="chip art">미술</span><h3>1-1 · 실루엣</h3><span class="bk-when lat">2주</span></div>
