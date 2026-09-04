@@ -1,0 +1,1455 @@
+<!doctype html>
+<html lang="ko">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="컴퓨터공학 전공자가 게임에 직접 넣을 픽셀아트와 BGM을 만들 수 있게 되는 12개월 학습 로드맵. 항목마다 그날 그대로 따라 할 순서가 붙어 있는 체크리스트.">
+<meta property="og:title" content="스프라이트와 루프">
+<meta property="og:description" content="게임 개발용 픽셀아트·작곡 12개월 학습 로드맵 (체크리스트)">
+<meta property="og:type" content="article">
+<style>
+  html{color-scheme:light dark}
+  body{margin:0}
+  img{max-width:100%}
+  [hidden]{display:none !important}
+</style>
+<title>스프라이트와 루프</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=IBM+Plex+Sans+KR:wght@300;400;500;600;700&display=swap">
+<style>
+  :root{
+    color-scheme: light;
+    --ground:#eceef5;
+    --surface:#ffffff;
+    --surface-2:#f4f6fb;
+    --ink:#131a30;
+    --ink-2:#1d2b53;
+    --muted:#5f688c;
+    --rule:#d3d8e8;
+    --rule-soft:#e5e9f3;
+    --art:#0a6f9e;
+    --art-soft:#dceffa;
+    --music:#ad2367;
+    --music-soft:#fadfec;
+    --core:#8a5a12;
+    --core-soft:#f7ead1;
+    --filled:#1d2b53;
+    --empty:#d7dce9;
+    --focus:#e08600;
+    --now-bg:#fffaf0;
+    --shadow:0 1px 0 rgba(29,43,83,.05), 0 6px 22px -14px rgba(29,43,83,.35);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      color-scheme: dark;
+      --ground:#111834;
+      --surface:#182046;
+      --surface-2:#1d2853;
+      --ink:#e7ecfa;
+      --ink-2:#ffffff;
+      --muted:#98a3ca;
+      --rule:#2d3868;
+      --rule-soft:#242e59;
+      --art:#5cc2ff;
+      --art-soft:#123457;
+      --music:#ff8fb8;
+      --music-soft:#4a1f39;
+      --core:#ffc45c;
+      --core-soft:#3d2f14;
+      --filled:#bac7ef;
+      --empty:#2a3563;
+      --focus:#ffa300;
+      --now-bg:#241f36;
+      --shadow:0 1px 0 rgba(0,0,0,.2), 0 8px 26px -16px rgba(0,0,0,.8);
+    }
+  }
+  :root[data-theme="dark"]{
+    color-scheme: dark;
+    --ground:#111834;
+    --surface:#182046;
+    --surface-2:#1d2853;
+    --ink:#e7ecfa;
+    --ink-2:#ffffff;
+    --muted:#98a3ca;
+    --rule:#2d3868;
+    --rule-soft:#242e59;
+    --art:#5cc2ff;
+    --art-soft:#123457;
+    --music:#ff8fb8;
+    --music-soft:#4a1f39;
+    --core:#ffc45c;
+    --core-soft:#3d2f14;
+    --filled:#bac7ef;
+    --empty:#2a3563;
+    --focus:#ffa300;
+    --now-bg:#241f36;
+    --shadow:0 1px 0 rgba(0,0,0,.2), 0 8px 26px -16px rgba(0,0,0,.8);
+  }
+
+  *{box-sizing:border-box}
+  body{
+    background:var(--ground);
+    color:var(--ink);
+    font-family:"IBM Plex Sans KR","Bricolage Grotesque",system-ui,-apple-system,"Malgun Gothic",sans-serif;
+    font-size:16px;
+    line-height:1.72;
+    -webkit-font-smoothing:antialiased;
+  }
+  .lat{font-family:"Bricolage Grotesque","IBM Plex Sans KR",system-ui,sans-serif}
+  a{color:var(--art);text-underline-offset:3px;text-decoration-thickness:1px}
+  a:hover{color:var(--ink-2)}
+  :focus-visible{outline:2px solid var(--focus);outline-offset:3px;border-radius:2px}
+  code{
+    font-family:ui-monospace,SFMono-Regular,"Cascadia Mono",Menlo,monospace;
+    font-size:.86em;background:var(--surface-2);padding:1px 5px;
+    border:1px solid var(--rule-soft);
+  }
+
+  .wrap{max-width:1120px;margin:0 auto;padding:0 24px 110px}
+
+  /* ---------- masthead ---------- */
+  header.top{padding:64px 0 40px;border-bottom:1px solid var(--rule)}
+  .eyebrow{
+    font-family:"Bricolage Grotesque",system-ui,sans-serif;
+    font-size:.72rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--muted);margin:0 0 18px;
+  }
+  h1{
+    font-family:"IBM Plex Sans KR",sans-serif;
+    font-weight:700;letter-spacing:-.03em;line-height:1.08;
+    font-size:clamp(2.1rem,5.4vw,3.4rem);
+    margin:0 0 20px;text-wrap:balance;color:var(--ink-2);
+  }
+  .lede{max-width:60ch;font-size:1.06rem;color:var(--ink);margin:0 0 34px}
+  .lede b{font-weight:600;color:var(--ink-2);box-shadow:inset 0 -.42em 0 var(--core-soft)}
+
+  .meter{display:flex;flex-wrap:wrap;align-items:baseline;gap:14px 22px}
+  .meter .count{
+    font-family:"Bricolage Grotesque",system-ui,sans-serif;
+    font-size:1.9rem;font-weight:800;letter-spacing:-.02em;color:var(--ink-2);
+    font-variant-numeric:tabular-nums;line-height:1;
+  }
+  .meter .count small{font-size:.9rem;font-weight:600;color:var(--muted)}
+  .meter .note{font-size:.82rem;color:var(--muted)}
+
+  /* ---------- pixel progress ---------- */
+  .px{display:flex;flex-wrap:wrap;gap:3px;margin:14px 0 0}
+  .px i{
+    width:11px;height:11px;background:var(--empty);display:block;
+    transition:background .16s ease;
+  }
+  .px i.on{background:var(--filled)}
+  .px.sm i{width:7px;height:7px}
+  .px.sm{gap:2px;margin:7px 0 0}
+
+  /* ---------- NOW card ---------- */
+  .now{
+    margin:38px 0 0;background:var(--now-bg);border:1px solid var(--rule);
+    border-left:4px solid var(--focus);padding:24px 26px 22px;box-shadow:var(--shadow);
+  }
+  .now-eyebrow{
+    font-family:"Bricolage Grotesque",system-ui,sans-serif;
+    font-size:.68rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--focus);margin:0 0 10px;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;
+  }
+  .now-where{color:var(--muted);letter-spacing:.08em;font-weight:600}
+  .now h2{
+    margin:0 0 4px;font-size:clamp(1.1rem,2.6vw,1.35rem);font-weight:600;
+    letter-spacing:-.02em;line-height:1.45;color:var(--ink-2);text-wrap:balance;
+  }
+  .now h2 b{font-weight:700}
+  .now h2 em{font-style:normal;color:var(--muted);font-size:.8em}
+  .now-body{margin:14px 0 0}
+  .now-body ol{margin:0;padding-left:1.3em}
+  .now-body li{margin:0 0 7px;font-size:.94rem}
+  .now-body .stuck{
+    margin:14px 0 0;font-size:.88rem;color:var(--muted);
+    padding:11px 14px;background:var(--surface);border:1px solid var(--rule-soft);
+  }
+  .now-body .stuck b{color:var(--ink-2);font-weight:600}
+  .now-act{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin:20px 0 0}
+  button.doit{
+    font-family:"IBM Plex Sans KR",sans-serif;font-size:.9rem;font-weight:600;
+    background:var(--ink-2);color:var(--surface);border:1px solid var(--ink-2);
+    padding:10px 20px;cursor:pointer;
+  }
+  button.doit:hover{background:var(--focus);border-color:var(--focus);color:#1d2b53}
+  .now-act a{font-size:.85rem;color:var(--muted)}
+  .now-act a:hover{color:var(--art)}
+  .now.done-all{border-left-color:var(--art)}
+  .now.done-all .now-eyebrow{color:var(--art)}
+
+  /* ---------- columns ---------- */
+  .cols{display:grid;grid-template-columns:216px minmax(0,1fr);gap:60px;align-items:start;padding-top:44px}
+  @media (max-width:900px){ .cols{grid-template-columns:1fr;gap:36px;padding-top:28px} }
+
+  nav.rail{position:sticky;top:24px}
+  @media (max-width:900px){ nav.rail{position:static} }
+  .rail h2{
+    font-family:"Bricolage Grotesque",system-ui,sans-serif;
+    font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);
+    font-weight:600;margin:0 0 16px;
+  }
+  .rail ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:16px}
+  .rail a{display:block;text-decoration:none;color:var(--ink)}
+  .rail a:hover .rl-name{color:var(--art)}
+  .rl-top{display:flex;align-items:baseline;gap:8px}
+  .rl-no{
+    font-family:"Bricolage Grotesque",system-ui,sans-serif;font-weight:800;font-size:.72rem;
+    color:var(--muted);font-variant-numeric:tabular-nums;
+  }
+  .rl-name{font-size:.9rem;font-weight:500;letter-spacing:-.01em}
+  .rl-when{font-size:.72rem;color:var(--muted);margin-left:auto;white-space:nowrap}
+  .rail li.here .rl-name{color:var(--focus);font-weight:600}
+  .rail li.here .rl-no{color:var(--focus)}
+
+  /* ---------- principles ---------- */
+  .rules{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:1px;
+    background:var(--rule);border:1px solid var(--rule);margin:0 0 68px;
+  }
+  .rules div{background:var(--surface);padding:22px 20px}
+  .rules h3{
+    margin:0 0 8px;font-size:.95rem;font-weight:600;letter-spacing:-.01em;color:var(--ink-2);
+  }
+  .rules p{margin:0;font-size:.88rem;color:var(--muted);line-height:1.62}
+
+  /* ---------- phase ---------- */
+  .phase{margin:0 0 76px;scroll-margin-top:24px}
+  .ph-head{display:flex;align-items:flex-start;gap:18px;margin:0 0 8px}
+  .ph-no{
+    font-family:"Bricolage Grotesque",system-ui,sans-serif;
+    font-size:clamp(2.4rem,7vw,3.6rem);font-weight:800;line-height:.82;
+    color:var(--empty);font-variant-numeric:tabular-nums;flex:none;letter-spacing:-.04em;
+  }
+  .ph-title{min-width:0}
+  .phase h2{
+    margin:0;font-size:clamp(1.35rem,3.2vw,1.8rem);font-weight:700;
+    letter-spacing:-.025em;line-height:1.25;color:var(--ink-2);text-wrap:balance;
+  }
+  .ph-when{
+    font-family:"Bricolage Grotesque",system-ui,sans-serif;
+    font-size:.74rem;font-weight:600;letter-spacing:.13em;text-transform:uppercase;
+    color:var(--muted);margin:6px 0 0;
+  }
+  .ph-goal{max-width:62ch;margin:14px 0 0;color:var(--ink)}
+  .ph-meter{display:flex;align-items:center;gap:12px;margin:20px 0 26px;flex-wrap:wrap}
+  .ph-frac{
+    font-family:"Bricolage Grotesque",system-ui,sans-serif;font-weight:600;font-size:.78rem;
+    color:var(--muted);font-variant-numeric:tabular-nums;
+  }
+
+  .block{
+    background:var(--surface);border:1px solid var(--rule);
+    padding:22px 22px 18px;margin:0 0 14px;box-shadow:var(--shadow);
+  }
+  .bk-head{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin:0 0 4px}
+  .block h3{
+    margin:0;font-size:1.02rem;font-weight:600;letter-spacing:-.015em;color:var(--ink-2);
+  }
+  .bk-when{font-size:.78rem;color:var(--muted);font-variant-numeric:tabular-nums}
+  .chip{
+    font-family:"Bricolage Grotesque",system-ui,sans-serif;
+    font-size:.66rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+    padding:3px 7px;white-space:nowrap;
+  }
+  .chip.art{background:var(--art-soft);color:var(--art)}
+  .chip.music{background:var(--music-soft);color:var(--music)}
+  .chip.core{background:var(--core-soft);color:var(--core)}
+  .bk-note{margin:6px 0 14px;font-size:.88rem;color:var(--muted);max-width:60ch}
+
+  ul.list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+  ul.list > li{border-top:1px solid var(--rule-soft);padding:2px 0 6px}
+  ul.list > li:first-child{border-top:0}
+  ul.list > li.now-here{background:var(--now-bg);box-shadow:-14px 0 0 var(--now-bg),14px 0 0 var(--now-bg)}
+  ul.list label{
+    display:grid;grid-template-columns:20px minmax(0,1fr);gap:13px;align-items:start;
+    padding:10px 2px 4px;cursor:pointer;
+  }
+  ul.list input{position:absolute;opacity:0;width:1px;height:1px;pointer-events:none}
+  .box{
+    width:16px;height:16px;margin-top:5px;border:1.5px solid var(--muted);
+    background:var(--surface);position:relative;flex:none;transition:background .13s,border-color .13s;
+  }
+  label:hover .box{border-color:var(--ink-2)}
+  input:checked + .box{background:var(--ink-2);border-color:var(--ink-2)}
+  input:checked + .box::after{
+    content:"";position:absolute;inset:0;
+    background:
+      linear-gradient(var(--surface),var(--surface)) 3px 7px/2px 2px no-repeat,
+      linear-gradient(var(--surface),var(--surface)) 5px 9px/2px 2px no-repeat,
+      linear-gradient(var(--surface),var(--surface)) 7px 7px/2px 2px no-repeat,
+      linear-gradient(var(--surface),var(--surface)) 9px 5px/2px 2px no-repeat,
+      linear-gradient(var(--surface),var(--surface)) 11px 3px/2px 2px no-repeat;
+  }
+  input:focus-visible + .box{outline:2px solid var(--focus);outline-offset:2px}
+  .txt{font-size:.95rem;line-height:1.6;transition:color .13s}
+  .txt b{font-weight:600;color:var(--ink-2)}
+  .txt em{font-style:normal;color:var(--muted);font-size:.86rem}
+  input:checked ~ .txt{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--rule)}
+  input:checked ~ .txt b{color:var(--muted);font-weight:400}
+
+  details.how{margin:0 0 0 33px}
+  details.how > summary{
+    list-style:none;cursor:pointer;display:inline-flex;align-items:center;gap:6px;
+    font-family:"Bricolage Grotesque",system-ui,sans-serif;
+    font-size:.7rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--muted);padding:3px 0 6px;
+  }
+  details.how > summary::-webkit-details-marker{display:none}
+  details.how > summary::before{content:"▸";font-size:.8rem;line-height:1}
+  details.how[open] > summary::before{content:"▾"}
+  details.how > summary:hover{color:var(--art)}
+  .how-body{
+    padding:14px 18px 15px;background:var(--surface-2);border:1px solid var(--rule-soft);
+    margin:0 0 10px;max-width:66ch;
+  }
+  .how-body ol{margin:0;padding-left:1.25em}
+  .how-body li{font-size:.9rem;line-height:1.62;margin:0 0 6px}
+  .how-body li:last-child{margin-bottom:0}
+  .how-body .stuck{
+    margin:12px 0 0;padding:9px 12px;background:var(--surface);border-left:2px solid var(--focus);
+    font-size:.86rem;color:var(--muted);line-height:1.6;
+  }
+  .how-body .stuck b{color:var(--ink-2);font-weight:600}
+
+  .done{
+    display:flex;gap:11px;align-items:flex-start;margin:18px 0 0;padding:13px 15px;
+    background:var(--surface-2);border-left:3px solid var(--focus);font-size:.89rem;
+  }
+  .done strong{font-weight:600;color:var(--ink-2);white-space:nowrap}
+
+  /* ---------- routine table ---------- */
+  .tablewrap{overflow-x:auto;border:1px solid var(--rule);background:var(--surface)}
+  table{border-collapse:collapse;width:100%;min-width:440px}
+  th,td{text-align:left;padding:13px 18px;border-bottom:1px solid var(--rule-soft);font-size:.91rem;vertical-align:top}
+  th{
+    font-family:"Bricolage Grotesque",system-ui,sans-serif;
+    font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:600;
+    background:var(--surface-2);
+  }
+  tr:last-child td{border-bottom:0}
+  td:first-child{white-space:nowrap;font-weight:600;color:var(--ink-2)}
+
+  /* ---------- traps + links ---------- */
+  section.tail{margin:0 0 62px}
+  section.tail > h2{
+    font-size:clamp(1.25rem,3vw,1.6rem);font-weight:700;letter-spacing:-.025em;
+    color:var(--ink-2);margin:0 0 8px;
+  }
+  section.tail > p.sub{margin:0 0 24px;color:var(--muted);max-width:60ch;font-size:.94rem}
+
+  .traps{display:flex;flex-direction:column;gap:1px;background:var(--rule);border:1px solid var(--rule)}
+  .traps article{background:var(--surface);padding:20px 22px;display:grid;grid-template-columns:auto minmax(0,1fr);gap:18px}
+  .traps .tno{
+    font-family:"Bricolage Grotesque",system-ui,sans-serif;font-weight:800;font-size:1.5rem;
+    color:var(--empty);line-height:1;
+  }
+  .traps h3{margin:0 0 6px;font-size:.98rem;font-weight:600;color:var(--ink-2);letter-spacing:-.01em}
+  .traps p{margin:0;font-size:.9rem;color:var(--muted);max-width:62ch}
+
+  .links{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:1px;background:var(--rule);border:1px solid var(--rule)}
+  .links > div{background:var(--surface);padding:20px 22px}
+  .links h3{
+    margin:0 0 12px;font-family:"Bricolage Grotesque",system-ui,sans-serif;
+    font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:600;
+  }
+  .links ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:11px}
+  .links li{font-size:.88rem;line-height:1.5}
+  .links li span{display:block;color:var(--muted);font-size:.81rem}
+
+  footer.bot{border-top:1px solid var(--rule);padding:26px 0 0;display:flex;gap:18px;
+    align-items:center;flex-wrap:wrap;justify-content:space-between}
+  footer.bot p{margin:0;font-size:.8rem;color:var(--muted);max-width:52ch}
+  button.reset{
+    font-family:"IBM Plex Sans KR",sans-serif;font-size:.82rem;font-weight:500;
+    background:var(--surface);color:var(--muted);border:1px solid var(--rule);
+    padding:9px 15px;cursor:pointer;transition:color .13s,border-color .13s;
+  }
+  button.reset:hover{color:var(--music);border-color:var(--music)}
+
+  @media (prefers-reduced-motion: reduce){ *{transition:none !important} }
+</style>
+
+<div class="wrap">
+
+  <header class="top">
+    <p class="eyebrow lat">Pixel Art &amp; Game Music · 12-Month Roadmap</p>
+    <h1>스프라이트와 루프</h1>
+    <p class="lede">컴퓨터공학 전공자가 게임에 직접 넣을 그림과 음악을 만들 수 있게 되는 12개월 계획.
+      목표는 <b>프로 수준</b>이 아니라 <b>게임에 넣어도 부끄럽지 않은 수준</b>입니다.
+      항목마다 <b>어떻게</b>를 펼치면 그날 그대로 따라 할 순서가 있습니다.</p>
+    <div class="meter">
+      <div>
+        <span class="count lat" id="total-count">0<small> / 0 완료</small></span>
+        <div class="px" id="total-px"></div>
+      </div>
+      <span class="note">체크 상태는 이 브라우저에만 저장됩니다.</span>
+    </div>
+
+    <div class="now" id="now">
+      <p class="now-eyebrow lat"><span>지금 할 일</span><span class="now-where" id="now-where"></span></p>
+      <h2 id="now-title"></h2>
+      <div class="now-body" id="now-body"></div>
+      <div class="now-act">
+        <button class="doit" id="now-done" type="button">이거 했다</button>
+        <a href="#" id="now-jump">로드맵에서 위치 보기</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="cols">
+
+    <nav class="rail" aria-label="단계 목록">
+      <h2 class="lat">Phases</h2>
+      <ol id="rail-list"></ol>
+    </nav>
+
+    <main>
+
+      <div class="rules">
+        <div>
+          <h3>한 번에 하나만</h3>
+          <p>그림과 음악을 동시에 시작하면 둘 다 안 늡니다. 그림이 먼저, 음악은 5개월차부터.</p>
+        </div>
+        <div>
+          <h3>날짜 수로 는다</h3>
+          <p>주말에 몰아서 5시간보다, 매일 30분이 낫습니다. 실력은 총 시간이 아니라 반복 횟수를 따라갑니다.</p>
+        </div>
+        <div>
+          <h3>미완성은 실력이 안 된다</h3>
+          <p>30분이 지나면 상태가 어떻든 저장하고 올립니다. 완성 개수가 그대로 실력입니다.</p>
+        </div>
+      </div>
+
+      <!-- ================= PHASE 0 ================= -->
+      <section class="phase" id="p0">
+        <div class="ph-head">
+          <div class="ph-no lat">00</div>
+          <div class="ph-title">
+            <h2>세팅</h2>
+            <p class="ph-when lat">Week 1 · 딱 일주일</p>
+          </div>
+        </div>
+        <p class="ph-goal">여기서 시간을 쓰면 안 됩니다. 도구 고르느라 한 달 보내는 게 가장 흔한 실패입니다. 일주일 안에 끝내고 넘어가세요.</p>
+        <div class="ph-meter"><div class="px sm" data-px="p0"></div><span class="ph-frac lat" data-frac="p0"></span></div>
+
+        <div class="block">
+          <div class="bk-head"><span class="chip core">준비</span><h3>0-1 · 도구와 습관</h3><span class="bk-when lat">1주</span></div>
+          <ul class="list" data-phase="p0">
+
+            <li>
+              <label><input type="checkbox" data-id="p0-1"><span class="box"></span><span class="txt">픽셀아트 툴 설치하고 <b>32×32 캔버스 열어보기</b></span></label>
+              <details class="how"><summary>어떻게</summary><div class="how-body">
+                <ol>
+                  <li>Steam이나 <a href="https://www.aseprite.org/">aseprite.org</a>에서 <b>Aseprite</b> 구매·설치 (약 2만 원대). 돈을 안 쓰겠다면 <a href="https://orama-interactive.itch.io/pixelorama">Pixelorama</a>(무료)로 시작해도 이 로드맵 전부 가능합니다.</li>
+                  <li>File → New → <code>32 × 32</code>, Color Mode는 <code>RGBA</code>, Background는 <code>Transparent</code>.</li>
+                  <li>화면 배율을 <b>정수로만</b> 맞추세요 — 400%, 800%. 어중간한 배율(350%)이면 픽셀이 흐릿하게 보입니다.</li>
+                  <li>View → <b>Pixel Grid</b> 켜기. 격자가 보여야 한 칸씩 판단할 수 있습니다.</li>
+                  <li>아무 점이나 찍고 <code>Ctrl+S</code>로 <code>.aseprite</code> 저장, <code>Ctrl+Alt+Shift+S</code>로 PNG 내보내기까지 한 번 해보기.</li>
+                </ol>
+                <p class="stuck"><b>막히면</b> 도구는 이걸로 끝입니다. 포토샵, Krita, Procreate 비교하지 마세요. 툴을 비교하는 시간이 곧 안 그리는 시간입니다.</p>
+              </div></details>
+            </li>
+
+            <li>
+              <label><input type="checkbox" data-id="p0-2"><span class="box"></span><span class="txt">Lospec에서 <b>16색 팔레트 3개</b> 받아서 툴에 불러오기</span></label>
+              <details class="how"><summary>어떻게</summary><div class="how-body">
+                <ol>
+                  <li><a href="https://lospec.com/palette-list">lospec.com/palette-list</a> → 왼쪽 필터에서 색 개수를 <b>8~32</b>로 좁히고 정렬은 Popular.</li>
+                  <li>세 개만 받으세요: <b>Sweetie 16</b>(밝고 만능), <b>PICO-8</b>(고전 게임 느낌), <b>Endesga 32</b>(색이 넉넉함).</li>
+                  <li>각 팔레트 페이지의 Downloads에서 <code>.gpl</code> 또는 <code>.ase</code> 받기.</li>
+                  <li>Aseprite 팔레트 패널 왼쪽 위 <b>폴더 아이콘 → Load Palette</b>로 불러오기. Presets에 저장해두면 다음부터 한 번에 바뀝니다.</li>
+                  <li>이번 달 내내 쓸 <b>기본 팔레트 하나</b>를 지금 정하세요. Sweetie 16을 권합니다.</li>
+                </ol>
+                <p class="stuck"><b>막히면</b> 팔레트를 직접 만들지 마세요. 색을 고르는 능력은 마지막에 생깁니다. 지금은 남이 검증한 16색 안에 갇혀 있는 게 이득입니다.</p>
+              </div></details>
+            </li>
+
+            <li>
+              <label><input type="checkbox" data-id="p0-3"><span class="box"></span><span class="txt">결과물 저장소 만들고 <b>파일명 규칙</b> 정하기</span></label>
+              <details class="how"><summary>어떻게</summary><div class="how-body">
+                <ol>
+                  <li>GitHub에 <code>pixel-daily</code> 같은 <b>공개</b> 레포 하나 생성.</li>
+                  <li>폴더는 월 단위로만: <code>2026-09/</code>, <code>2026-10/</code> … 그 이상 정리하지 마세요.</li>
+                  <li>파일명은 <code>0904-sword-01.png</code> 형식 — 날짜, 대상, 번호. 나중에 성장 비교할 때 이 규칙이 전부입니다.</li>
+                  <li>README에 규칙 한 줄만 적고 첫 커밋. 꾸미지 마세요.</li>
+                </ol>
+                <p class="stuck"><b>막히면</b> 잘 나온 것만 올리고 싶어지는데, 못 그린 것을 남겨야 3개월 뒤에 는 게 보입니다. 전부 올리세요.</p>
+              </div></details>
+            </li>
+
+            <li>
+              <label><input type="checkbox" data-id="p0-4"><span class="box"></span><span class="txt">캘린더에 <b>매일 30분</b> 반복 일정 등록</span></label>
+              <details class="how"><summary>어떻게</summary><div class="how-body">
+                <ol>
+                  <li>캘린더 앱에서 <b>매일 같은 시각</b> 30분 반복 일정 생성. 예: 22:00–22:30.</li>
+                  <li>제목은 행동으로 씁니다. ✗ "취미" → ✓ <b>"픽셀 30분"</b>.</li>
+                  <li>10분 전 알림 설정.</li>
+                  <li>시간대는 <b>일과가 끝난 뒤 고정 시간</b>이 가장 오래갑니다. 아침형이 아니라면 아침에 배치하지 마세요.</li>
+                </ol>
+                <p class="stuck"><b>막히면</b> 하루 빠졌다고 그만두는 게 진짜 실패입니다. 빠진 날은 그냥 빠진 날로 두고 다음 날 이어가세요.</p>
+              </div></details>
+            </li>
+
+            <li>
+              <label><input type="checkbox" data-id="p0-5"><span class="box"></span><span class="txt">타이머 30분 프리셋 만들고 <b>완성 규칙</b> 붙여두기</span></label>
+              <details class="how"><summary>어떻게</summary><div class="how-body">
+                <ol>
+                  <li>휴대폰 타이머에 30분 프리셋 저장.</li>
+                  <li>종이에 이렇게 적어 모니터 옆에 붙이기 — <b>"30분 지나면 무조건 저장하고 올린다."</b></li>
+                  <li>첫날, 타이머가 울릴 때 실제로 미완성인 채로 저장하고 커밋해보기. 이 감각이 12개월을 버티게 합니다.</li>
+                </ol>
+              </div></details>
+            </li>
+
+          </ul>
+          <p class="done"><strong>완료 기준</strong> <span>툴이 열리고, 팔레트가 들어가 있고, 캘린더에 반복 일정이 있고, 빈 저장소가 있다.</span></p>
+        </div>
+      </section>
+
+      <!-- ================= PHASE 1 ================= -->
+      <section class="phase" id="p1">
+        <div class="ph-head">
+          <div class="ph-no lat">01</div>
+          <div class="ph-title">
+            <h2>픽셀아트 기초</h2>
+            <p class="ph-when lat">Month 1–3 · 주 5회 × 30분</p>
+          </div>
+        </div>
+        <p class="ph-goal">픽셀아트는 “그림을 잘 그리는” 기술이 아니라 <b>해상도를 낮춰 난이도를 낮추는</b> 기법입니다.
+          32×32 캔버스에서는 손기술보다 판단(형태가 읽히는가, 색을 몇 개 쓸 것인가)이 전부라서, 그림을 못 그려도 몇 주면 쓸 만한 게 나옵니다.
+          순서를 지키는 것이 중요합니다 — 색부터 손대면 안 늡니다.</p>
+        <div class="ph-meter"><div class="px sm" data-px="p1"></div><span class="ph-frac lat" data-frac="p1"></span></div>
+
+        <div class="block">
+          <div class="bk-head"><span class="chip art">미술</span><h3>1-1 · 실루엣</h3><span class="bk-when lat">2주</span></div>
+          <p class="bk-note">검은 덩어리만으로 뭔지 알아보이게 만드는 단계입니다. 여기서 읽히면 색을 아무리 못 칠해도 살아납니다.</p>
+          <ul class="list" data-phase="p1">
+
+            <li>
+              <label><input type="checkbox" data-id="p1-1"><span class="box"></span><span class="txt">그릴 대상 <b>20개 목록</b> 먼저 적어두기 <em>· 매일 "뭐 그리지"로 10분 날리지 않기 위해</em></span></label>
+              <details class="how"><summary>어떻게</summary><div class="how-body">
+                <ol>
+                  <li>메모장에 20개를 그냥 적으세요. 예시 그대로 써도 됩니다 —<br>
+                    검, 방패, 물약, 열쇠, 문, 나무, 버섯, 보물상자, 횃불, 사다리, 항아리, 두루마리, 반지, 활, 도끼, 왕관, 책, 폭탄, 물고기, 별.</li>
+                  <li>고를 때 기준은 하나: <b>실루엣이 특징적인 것</b>. 구름·물 같은 건 나중에.</li>
+                  <li>레포에 <code>2026-09/list.txt</code>로 커밋해두고, 매일 위에서부터 하나씩 지워나갑니다.</li>
+                </ol>
+              </div></details>
+            </li>
+
+            <li>
+              <label><input type="checkbox" data-id="p1-2"><span class="box"></span><span class="txt">32×32에 <b>단색 실루엣 20개</b> — 하루 2개씩 10일</span></label>
+              <details class="how"><summary>어떻게</summary><div class="how-body">
+                <ol>
+                  <li>팔레트에서 <b>검정 한 색만</b> 선택. 다른 색은 오늘 쓰지 않습니다.</li>
+                  <li>대상마다 <b>가장 알아보기 쉬운 각도</b>를 먼저 정하기 — 검은 옆에서, 왕관은 정면에서, 열쇠는 비스듬히.</li>
+                  <li>연필로 외곽선부터 긋지 말고, <b>사각형 덩어리</b>를 크게 놓은 다음 지우개로 깎아내세요. 조각하듯이.</li>
+                  <li>한 개에 <b>최대 5분</b>. 타이머 울리면 미완성이어도 저장하고 다음 것으로.</li>
+                  <li>매일 끝나면 그날 것 커밋.</li>
+                </ol>
+                <p class="stuck"><b>막히면</b> 형태가 애매하면 실제 사진을 찾아 <b>눈을 가늘게 뜨고</b> 덩어리만 보세요. 디테일이 아니라 윤곽이 전부입니다.</p>
+              </div></details>
+            </li>
+
+            <li>
+              <label><input type="checkbox" data-id="p1-3"><span class="box"></span><span class="txt">5개 골라 <b>남에게 맞혀보게 하기</b> <em>· 3개 이상 맞으면 통과</em></span></label>
+              <details class="how"><summary>어떻게</summary><div class="how-body">
+                <ol>
+                  <li>실루엣 5개를 한 장에 나란히 배치해 PNG로 내보내기 (배율 400%로 키워서).</li>
+                  <li>친구나 가족에게 보내고 <b>"이거 뭐로 보여?"</b>만 물어보세요. 힌트·주제·맥락 전부 금지.</li>
+                  <li>맞힌 개수를 메모에 기록. 3개 미만이면 실루엣 5개를 더 그리고 다시 테스트.</li>
+                </ol>
+                <p class="stuck"><b>막히면</b> 안 맞히는 건 색을 안 칠해서가 아닙니다. 형태 선택이 틀린 겁니다. 각도를 바꿔 다시 그리세요.</p>
+              </div></details>
+            </li>
+
+            <li>
+              <label><input type="checkbox" data-id="p1-4"><span class="box"></span><span class="txt">잘 안 읽힌 것 3개 <b>외곽선만 고쳐서</b> 다시 그리기</span></label>
+              <details class="how"><summary>어떻게</summary><div class="how-body">
+                <ol>
+                  <li>원본 파일을 복사해서 <code>-v2</code>로 새로 만들기. 원본은 지우지 마세요 — 비교가 남아야 합니다.</li>
+                  <li>고칠 건 딱 두 가지: <b>비율</b>(부분이 너무 작거나 큼)과 <b>튀어나온 특징</b>(칼자루 가드, 왕관 뿔 등).</li>
+                  <li>v1과 v2를 나란히 놓고 PNG 한 장으로 저장. 이게 첫 성장 기록입니다.</li>
+                </ol>
+              </div></details>
+            </li>
+
+          </ul>
+        </div>
+
+        <div class="block">
+          <div class="bk-head"><span class="chip art">미술</span><h3>1-2 · 명암</h3><span class="bk-when lat">3주</span></div>
+          <p class="bk-note">그림이 안 예뻐 보이는 이유의 대부분은 색이 아니라 명암입니다. 색은 아직 쓰지 않습니다.</p>
+          <ul class="list" data-phase="p1">
+
+            <li>
+              <label><input type="checkbox" data-id="p1-5"><span class="box"></span><span class="txt"><b>흑백 3단계</b>로만 아이템 20개 <em>· 어두움·중간·밝음</em></span></label>
+              <details class="how"><summary>어떻게</summary><div class="how-body">
+                <ol>
+                  <li>팔레트를 직접 3칸으로 만드세요: <code>#2b2b2b</code>, <code>#7a7a7a</code>, <code>#e0e0e0</code>. 이 3색 외엔 쓰지 않습니다.</li>
+                  <li>1-1에서 그린 실루엣을 재활용하세요. 새로 그리지 말고 <b>덩어리 안을 나누는 연습</b>입니다.</li>
+                  <li>순서: 전체를 중간색으로 채움 → 빛 받는 면을 밝음으로 → 그림자 면을 어두움으로.</li>
+                  <li>하루 2개, 10일.</li>
+                </ol>
+                <p class="stuck"><b>막히면</b> 3단계가 답답해도 늘리지 마세요. 색 수를 늘리면 판단이 흐려져서 오히려 안 늡니다.</p>
+              </div></details>
+            </li>
+
+            <li>
+              <label><input type="checkbox" data-id="p1-6"><span class="box"></span><span class="txt">광원 방향 <b>왼쪽 위로 고정</b>하고 20개 내내 지키기</span></label>
+              <details class="how"><summary>어떻게</summary><div class="how-body">
+                <ol>
+                  <li>캔버스 왼쪽 위 구석에 작은 점 하나를 찍어두고 작업하세요. 다 그리면 지웁니다. 광원을 잊지 않기 위한 표식입니다.</li>
+                  <li>규칙 두 개만: <b>왼쪽 위 면은 밝음</b>, <b>오른쪽 아래 면은 어두움</b>.</li>
+                  <li>다 그린 뒤 20개를 한 화면에 모아 보세요. 광원이 흔들린 게 바로 보입니다.</li>
+                </ol>
+                <p class="stuck"><b>막히면</b> 게임 스프라이트가 대부분 왼쪽 위 광원인 이유는, 여러 사람이 그려도 한 세트로 보이게 하기 위해서입니다. 취향이 아니라 규약입니다.</p>
+              </div></details>
+            </li>
+
+            <li>
+              <label><input type="checkbox" data-id="p1-7"><span class="box"></span><span class="txt">매번 <b>눈 가늘게 뜨고</b> 형태가 남는지 확인하기</span></label>
+              <details class="how"><summary>어떻게</summary><div class="how-body">
+                <ol>
+                  <li>완성했다 싶으면 화면에서 <b>한 발 물러나 눈을 가늘게</b> 뜹니다. 또는 배율을 100%로 줄여서 보세요.</li>
+                  <li>덩어리가 뭉개져 하나로 보이면 <b>명암 대비가 부족</b>한 것 — 밝음을 더 밝게, 어두움을 더 어둡게.</li>
+                  <li>매 작업 끝에 이 확인을 하고, 고친 것은 파일명에 <code>-fix</code>를 붙여 남기세요.</li>
+                </ol>
+              </div></details>
+            </li>
+
+            <li>
+              <label><input type="checkbox" data-id="p1-8"><span class="box"></span><span class="txt">부족했던 5개를 <b>4단계</b>로 다시 그려 비교</span></label>
+              <details class="how"><summary>어떻게</summary><div class="how-body">
+                <ol>
+                  <li>3색 팔레트에 <b>하이라이트 한 칸</b>을 추가합니다 (<code>#ffffff</code>에 가까운 색).</li>
+                  <li>하이라이트는 <b>가장 튀어나온 한 지점에만</b>. 넓게 칠하면 즉시 싸구려로 보입니다.</li>
+                  <li>3단계 버전과 4단계 버전을 나란히 저장해서 커밋.</li>
+                </ol>
+              </div></details>
+            </li>
+
+          </ul>
+        </div>
+
+        <div class="block">
+          <div class="bk-head"><span class="chip art">미술</span><h3>1-3 · 색</h3><span class="bk-when lat">3주</span></div>
+          <p class="bk-note">팔레트를 직접 만들지 마세요. 검증된 팔레트를 쓰고, 선택지를 줄이는 것으로 실력을 대신합니다.</p>
+          <ul class="list" data-phase="p1">
+
+            <li>
+              <label><input type="checkbox" data-id="p1-9"><span class="box"></span><span class="txt"><b>16색 팔레트 안에서만</b> 아이템 20개</span></label>
+              <details class="how"><summary>어떻게</summary><div class="how-body">
+                <ol>
+                  <li>Sweetie 16을 불러오고, <b>스포이드로 팔레트에서만</b> 색을 집으세요. 색상환에서 직접 고르는 건 금지.</li>
+                  <li>1-2에서 만든 흑백 그림을 색으로 옮기는 연습입니다. <b>명암 단계는 그대로 두고 색만 갈아 끼우세요.</b></li>
+                  <li>어두운 부분은 단순히 검정을 섞지 말고, <b>팔레트에서 더 어둡고 채도 있는 색</b>을 고르세요 (예: 갈색의 그림자는 회색이 아니라 보라·남색 쪽).</li>
+                  <li>하루 2개, 10일.</li>
+                </ol>
+                <p class="stuck"><b>막히면</b> 그림자에 "같은 색의 어두운 버전"만 쓰면 탁해 보입니다. 그림자는 색상(hue)을 살짝 파란·보라 쪽으로 돌리는 게 정석입니다.</p>
+              </div></details>
+            </li>
+
+            <li>
+              <label><input type="checkbox" data-id="p1-10"><span class="box"></span><span class="txt">같은 스프라이트를 <b>팔레트 3개로</b> 각각 칠해보기</span></label>
+              <details class="how"><summary>어떻게</summary><div class="how-body">
+                <ol>
+                  <li>가장 잘 나온 스프라이트 하나를 고릅니다.</li>
+                  <li>레이어를 복제해서 Sweetie 16 / PICO-8 / Endesga 32 버전을 각각 만들기.</li>
+                  <li>세 개를 나란히 놓고 PNG 한 장으로 저장 — <b>같은 형태가 팔레트만으로 얼마나 달라지는지</b>가 이 연습의 전부입니다.</li>
+                </ol>
+              </div></details>
+            </li>
+
+            <li>
+              <label><input type="checkbox" data-id="p1-11"><span class="box"></span><span class="txt">색 <b>5개 이하</b>로 제한한 32×32 캐릭터 1개</span></label>
+              <details class="how"><summary>어떻게</summary><div class="how-body">
+                <ol>
+                  <li>32×32 안에서 캐릭터는 대략 <b>가로 16 · 세로 24</b> 정도를 차지하게 잡으세요. 꽉 채우면 애니메이션할 여백이 없습니다.</li>
+                  <li>색 배분: 피부 1 · 옷 2(밝음/어두움) · 머리 1 · 외곽선 1. 이걸로 5개입니다.</li>
+                  <li>얼굴 디테일은 <b>눈 두 점</b>이면 충분합니다. 32px에서 코와 입은 넣을수록 나빠집니다.</li>
+                  <li>완성하면 배율 100%로 축소해서 확인 — 이 크기에서 사람으로 보이면 성공.</li>
+                </ol>
+                <p class="stuck"><b>막히면</b> 이 캐릭터를 1-4 애니메이션과 게임잼까지 계속 씁니다. 마음에 드는 걸로 만드세요.</p>
+              </div></details>
+            </li>
+
+            <li>
+              <label><input type="checkbox" data-id="p1-12"><span class="box"></span><span class="txt">같은 캐릭터의 <b>낮 / 밤 버전</b> — 팔레트만 바꿔서</span></label>
+              <details class="how"><summary>어떻게</summary><div class="how-body">
+                <ol>
+                  <li>밤 버전은 전체적으로 <b>어둡게</b> + <b>파란 쪽으로</b> + <b>대비를 줄여서</b>.</li>
+                  <li>색을 하나하나 다시 고르지 말고, 팔레트에서 각 색의 "밤 대응 색"을 정해 표를 만들어 교체하세요.</li>
+                  <li>이 색 대응표가 나중에 4-3의 <b>팔레트 스왑 스크립트</b>가 됩니다. 표를 버리지 마세요.</li>
+                </ol>
+              </div></details>
+            </li>
+
+          </ul>
+        </div>
+
+        <div class="block">
+          <div class="bk-head"><span class="chip art">미술</span><h3>1-4 · 애니메이션</h3><span class="bk-when lat">4주</span></div>
+          <p class="bk-note">여기까지 오면 게임 하나를 만들 수 있습니다. 프레임 수를 늘리지 말고, 적은 프레임으로 읽히게 하세요.</p>
+          <ul class="list" data-phase="p1">
+
+            <li>
+              <label><input type="checkbox" data-id="p1-13"><span class="box"></span><span class="txt"><b>4프레임 코인 회전</b> <em>· 애니메이션 입문의 정석</em></span></label>
+              <details class="how"><summary>어떻게</summary><div class="how-body">
+                <ol>
+                  <li>16×16 캔버스, 프레임 4개 (Aseprite에서 <code>Alt+N</code>으로 프레임 추가).</li>
+                  <li>1번: 정면 원. 2번: 살짝 납작한 타원. 3번: <b>세로 선 한 줄</b>(옆면). 4번: 다시 타원.</li>
+                  <li>재생 속도는 프레임당 <b>100ms</b>부터. 스페이스바로 미리보기.</li>
+                  <li>GIF로 내보내서 커밋 (<code>Ctrl+Alt+Shift+S</code> → gif).</li>
+                </ol>
+                <p class="stuck"><b>막히면</b> 3번 프레임을 과감하게 얇게 만들어야 회전으로 보입니다. 어중간하면 그냥 찌그러진 원으로 보입니다.</p>
+              </div></details>
+            </li>
+
+            <li>
+              <label><input type="checkbox" data-id="p1-14"><span class="box"></span><span class="txt"><b>6프레임 걷기 사이클</b> — 1-3에서 만든 캐릭터로</span></label>
+              <details class="how"><summary>어떻게</summary><div class="how-body">
+                <ol>
+                  <li>순서를 이렇게 잡으세요: <b>접촉 → 낮은 지점 → 통과 → 접촉(반대발) → 낮은 지점 → 통과</b>.</li>
+                  <li>제일 먼저 그릴 건 <b>1번(접촉)과 4번(반대발 접촉)</b>입니다. 두 개가 대칭이면 나머지는 쉽습니다.</li>
+                  <li>몸통 전체를 <b>1픽셀 위아래로</b> 움직이세요. 이 상하 운동이 걷기의 90%입니다.</li>
+                  <li>프레임당 120ms로 재생하고, 제자리 걸음이 어색하지 않으면 완성.</li>
+                </ol>
+                <p class="stuck"><b>막히면</b> 팔다리를 정교하게 그리려 하지 마세요. 32px에서 다리는 2~3픽셀 폭입니다. 위치만 바뀌면 뇌가 알아서 걷는 걸로 봅니다.</p>
+              </div></details>
+            </li>
+
+            <li>
+              <label><input type="checkbox" data-id="p1-15"><span class="box"></span><span class="txt"><b>8프레임 공격 모션</b> — 예비동작 3 + 타격 1 + 잔상 4</span></label>
+              <details class="how"><summary>어떻게</summary><div class="how-body">
+                <ol>
+                  <li>1~3번은 <b>뒤로 젖히는</b> 예비동작. 천천히(프레임당 120ms).</li>
+                  <li>4번은 <b>타격 한 장</b>. 여기만 60ms로 짧게 — 빠를수록 세게 느껴집니다.</li>
+                  <li>5~8번은 무기 궤적(흰 반달)과 원위치 복귀.</li>
+                  <li>타격 프레임에서 캐릭터를 <b>1~2픽셀 앞으로</b> 밀어보세요. 타격감이 확 달라집니다.</li>
+                </ol>
+                <p class="stuck"><b>막히면</b> 타격감은 그림이 아니라 <b>타이밍</b>에서 나옵니다. 예비동작을 길게, 타격을 짧게. 이 비율만 지키면 됩니다.</p>
+              </div></details>
+            </li>
+
+            <li>
+              <label><input type="checkbox" data-id="p1-16"><span class="box"></span><span class="txt"><b>모작 30개</b> — 좋아하는 게임 스프라이트를 그대로 따라 찍기</span></label>
+              <details class="how"><summary>어떻게</summary><div class="how-body">
+                <ol>
+                  <li>The Spriters Resource 같은 곳에서 좋아하는 게임의 스프라이트 시트를 구해 <b>참고용으로만</b> 옆에 띄웁니다.</li>
+                  <li>복사·붙여넣기 금지. <b>보고 한 픽셀씩 다시 찍으세요.</b> 그 과정에서 "왜 여기에 이 색을 썼는지"가 보입니다.</li>
+                  <li>하나 끝날 때마다 <b>한 줄 메모</b>: 배운 점 하나. 예 — "외곽선을 검정이 아니라 어두운 갈색으로 썼다".</li>
+                  <li>1-1부터 1-4까지 진행하면서 <b>병행</b>하세요. 하루 30분 중 10분을 모작에 쓰면 3개월에 30개가 됩니다.</li>
+                  <li>모작은 연습용입니다. 공개 레포에 올릴 땐 <b>출처를 적고</b>, 게임에 쓰지는 마세요.</li>
+                </ol>
+                <p class="stuck"><b>막히면</b> 이 항목 하나가 나머지 전부보다 효과가 큽니다. 다른 걸 빼먹더라도 모작은 채우세요.</p>
+              </div></details>
+            </li>
+
+          </ul>
+          <p class="done"><strong>완료 기준</strong> <span>게임에 바로 넣을 수 있는 캐릭터 1종 + 대기·걷기·공격 애니메이션, 그리고 모작 30개.</span></p>
+        </div>
+      </section>
+
+      <!-- ================= PHASE 2 ================= -->
+      <section class="phase" id="p2">
+        <div class="ph-head">
+          <div class="ph-no lat">02</div>
+          <div class="ph-title">
+            <h2>첫 출하</h2>
+            <p class="ph-when lat">Month 4 · 게임잼</p>
+          </div>
+        </div>
+        <p class="ph-goal">이 단계가 로드맵 전체에서 가장 중요합니다.
+          “48시간 안에 어떻게든 끝내야 하는” 압박이 완벽주의를 없애주고, 무엇보다 <b>실제로 게임에 들어간 결과물</b>이 남습니다.
+          음악은 아직 무료 에셋을 써도 됩니다 — 이번엔 그림만 직접.</p>
+        <div class="ph-meter"><div class="px sm" data-px="p2"></div><span class="ph-frac lat" data-frac="p2"></span></div>
+
+        <div class="block">
+          <div class="bk-head"><span class="chip art">미술</span><span class="chip core">출하</span><h3>2-1 · 게임잼 한 번</h3></div>
+          <ul class="list" data-phase="p2">
+
+            <li>
+              <label><input type="checkbox" data-id="p2-1"><span class="box"></span><span class="txt">잼 일정 확인하고 <b>캘린더에 등록</b></span></label>
+              <details class="how"><summary>어떻게</summary><div class="how-body">
+                <ol>
+                  <li><a href="https://ldjam.com/">Ludum Dare</a>(연 2회, 48/72시간)와 <a href="https://itch.io/jams">itch.io 잼 목록</a>에서 <b>4개월차에 걸리는 것</b>을 하나 고르세요.</li>
+                  <li>날짜를 캘린더에 <b>이틀 통째로</b> 잡고, 그 주말 약속을 미리 비웁니다.</li>
+                  <li>규모가 부담되면 itch.io의 소규모 잼(참가자 수십 명)으로 시작해도 효과는 같습니다.</li>
+                </ol>
+              </div></details>
+            </li>
+
+            <li>
+              <label><input type="checkbox" data-id="p2-2"><span class="box"></span><span class="txt">잼 전에 <b>혼자 48시간 미니잼</b> 1회 연습</span></label>
+              <details class="how"><summary>어떻게</summary><div class="how-body">
+                <ol>
+                  <li>주제는 아무 단어나 하나 뽑으세요. "중력", "열쇠", "밤" 같은 것.</li>
+                  <li>목표는 재미가 아니라 <b>완주</b>입니다. 화면 하나, 조작 하나, 끝나는 조건 하나면 충분합니다.</li>
+                  <li>시간을 미리 쪼개두세요: <b>기획 2h → 코드 20h → 아트 12h → 사운드 4h → 마무리·업로드 10h</b>.</li>
+                  <li>끝나면 실제 itch.io에 올려서 <b>업로드까지</b> 해보세요. 본 대회 때 여기서 시간을 안 뺏깁니다.</li>
+                </ol>
+                <p class="stuck"><b>막히면</b> 미니잼에서 못 끝냈다면 본 대회 계획을 반으로 줄이세요. 규모를 줄이는 건 실패가 아니라 유일하게 통하는 전략입니다.</p>
+              </div></details>
+            </li>
+
+            <li>
+              <label><input type="checkbox" data-id="p2-3"><span class="box"></span><span class="txt">잼 참가 — <b>아트는 100% 직접</b>, 음악은 무료 에셋 허용</span></label>
+              <details class="how"><summary>어떻게</summary><div class="how-body">
+                <ol>
+                  <li>시작 전에 <b>스프라이트 목록을 먼저</b> 적으세요. 캐릭터 1 · 적 1 · 타일 3 · 아이템 2 정도로 상한을 두고, 그 이상은 안 만듭니다.</li>
+                  <li>1-3에서 만든 캐릭터를 그대로 쓰세요. 새로 만들 시간 없습니다.</li>
+                  <li>음악은 <a href="https://itch.io/game-assets/free/tag-music">itch.io 무료 음악 에셋</a>에서. 라이선스(CC0 / CC-BY)를 확인하고 <b>크레딧을 적어두세요.</b></li>
+                  <li>마지막 4시간은 <b>무조건</b> 버그 수정과 업로드용으로 비워둡니다.</li>
+                </ol>
+                <p class="stuck"><b>막히면</b> 잼에서 미완성으로 끝나는 1번 원인은 아트를 너무 많이 계획한 것입니다. 목록에 상한을 두세요.</p>
+              </div></details>
+            </li>
+
+            <li>
+              <label><input type="checkbox" data-id="p2-4"><span class="box"></span><span class="txt"><b>itch.io 페이지</b> 만들고 스크린샷 3장 + GIF 1개 올리기</span></label>
+              <details class="how"><summary>어떻게</summary><div class="how-body">
+                <ol>
+                  <li>커버 이미지는 <b>630×500</b>. 게임 화면을 그대로 쓰지 말고, 캐릭터가 크게 보이게 다시 구성하세요.</li>
+                  <li>GIF는 <b>3~5초, 첫 1초 안에 핵심 동작</b>이 나오게. 목록에서 이 GIF가 전부입니다.</li>
+                  <li>설명은 세 줄이면 충분: 뭘 하는 게임인지 / 조작키 / 크레딧(쓴 음악 에셋 출처).</li>
+                  <li>웹(HTML5)으로 빌드할 수 있으면 반드시 웹으로. 다운로드는 사람들이 안 받습니다.</li>
+                </ol>
+              </div></details>
+            </li>
+
+            <li>
+              <label><input type="checkbox" data-id="p2-5"><span class="box"></span><span class="txt">회고 <b>5줄</b> 쓰기</span></label>
+              <details class="how"><summary>어떻게</summary><div class="how-body">
+                <ol>
+                  <li>레포에 <code>retro-2027-01.md</code> 같은 파일로 남기세요.</li>
+                  <li>다섯 줄만 채웁니다 — 가장 오래 걸린 것 / 가장 부족했던 것 / 다시 쓸 수 있게 만들어둘 것 / 다음에 안 할 것 / 의외로 잘 된 것.</li>
+                  <li>이 회고가 4-2의 블로그 글 재료가 됩니다.</li>
+                </ol>
+              </div></details>
+            </li>
+
+            <li>
+              <label><input type="checkbox" data-id="p2-6"><span class="box"></span><span class="txt">부족했던 것 하나를 <b>2주 연습 과제</b>로 정해 실행</span></label>
+              <details class="how"><summary>어떻게</summary><div class="how-body">
+                <ol>
+                  <li>회고에서 "가장 부족했던 것" <b>딱 하나만</b> 고르세요. 예: 배경 타일, UI 폰트, 적 캐릭터.</li>
+                  <li>2주 × 30분을 전부 그것에만 씁니다.</li>
+                  <li>끝나면 잼 게임에 그걸 반영해서 <b>업데이트 버전을 다시 올리세요.</b> 잼 이후 개선판을 올리는 습관이 포트폴리오를 만듭니다.</li>
+                </ol>
+              </div></details>
+            </li>
+
+          </ul>
+          <p class="done"><strong>완료 기준</strong> <span>남이 눌러서 플레이할 수 있는 링크 하나.</span></p>
+        </div>
+      </section>
+
+      <!-- ================= PHASE 3 ================= -->
+      <section class="phase" id="p3">
+        <div class="ph-head">
+          <div class="ph-no lat">03</div>
+          <div class="ph-title">
+            <h2>작곡 기초</h2>
+            <p class="ph-when lat">Month 5–8 · 주 5회 × 30분</p>
+          </div>
+        </div>
+        <p class="ph-goal">여기서 전공이 유리해집니다. 음악 이론은 사실상 정수 연산입니다 —
+          음정은 반음 개수, 스케일은 12칸 배열의 패턴, 코드 진행은 상태 전이입니다.
+          이걸 규칙으로 이해하면 “감”으로 배우는 것보다 훨씬 빠릅니다.</p>
+        <div class="ph-meter"><div class="px sm" data-px="p3"></div><span class="ph-frac lat" data-frac="p3"></span></div>
+
+        <div class="block">
+          <div class="bk-head"><span class="chip music">작곡</span><h3>3-1 · 세팅</h3><span class="bk-when lat">1주</span></div>
+          <ul class="list" data-phase="p3">
+
+            <li>
+              <label><input type="checkbox" data-id="p3-1"><span class="box"></span><span class="txt"><b>DAW 설치</b> — REAPER 또는 LMMS</span></label>
+              <details class="how"><summary>어떻게</summary><div class="how-body">
+                <ol>
+                  <li><a href="https://www.reaper.fm/">REAPER</a>를 받으세요. 평가판이 기능 제한 없이 계속 실행되고, 마음에 들면 개인 라이선스가 $60입니다. 완전 무료를 원하면 <a href="https://lmms.io/">LMMS</a>.</li>
+                  <li>설치 후 <b>Options → Preferences → Audio → Device</b>에서 출력 장치를 잡고 소리가 나는지 확인.</li>
+                  <li>새 프로젝트 템포는 일단 <code>120 BPM</code>, 박자는 <code>4/4</code>로 두세요.</li>
+                  <li>트랙 하나 만들고(<code>Ctrl+T</code>) MIDI 아이템을 그려 아무 음이나 재생해보기.</li>
+                </ol>
+                <p class="stuck"><b>막히면</b> 소리가 안 나면 십중팔구 오디오 드라이버 문제입니다. Windows라면 장치를 <b>WASAPI</b>로 바꿔보세요.</p>
+              </div></details>
+            </li>
+
+            <li>
+              <label><input type="checkbox" data-id="p3-2"><span class="box"></span><span class="txt"><b>무료 음원</b> 설치 — LABS, Vital, Surge XT</span></label>
+              <details class="how"><summary>어떻게</summary><div class="how-body">
+                <ol>
+                  <li><a href="https://labs.spitfireaudio.com/">Spitfire LABS</a> — 실제 악기 소리. 일단 <b>Soft Piano</b>와 <b>Strings</b>만 받으세요.</li>
+                  <li><a href="https://vital.audio/">Vital</a> — 신디사이저. 게임 음악의 리드·베이스는 대부분 여기서 나옵니다.</li>
+                  <li><a href="https://surge-synthesizer.github.io/">Surge XT</a> — 무료인데 프리셋이 많아 고르기만 해도 됩니다.</li>
+                  <li>설치 후 DAW에서 <b>플러그인 폴더를 다시 스캔</b>해야 목록에 뜹니다 (REAPER: Preferences → Plug-ins → VST → Re-scan).</li>
+                </ol>
+                <p class="stuck"><b>막히면</b> 음원을 더 모으지 마세요. 이 셋으로 12개월 내내 충분합니다. 음원 수집은 미루기의 다른 형태입니다.</p>
+              </div></details>
+            </li>
+
+            <li>
+              <label><input type="checkbox" data-id="p3-3"><span class="box"></span><span class="txt">(선택) <b>25건반 MIDI 키보드</b> <em>· 없어도 마우스로 찍을 수 있습니다</em></span></label>
+              <details class="how"><summary>어떻게</summary><div class="how-body">
+                <ol>
+                  <li>2~3만 원대 25건반이면 충분합니다. 건반 수나 터치감은 지금 단계에서 의미 없습니다.</li>
+                  <li>USB로 연결하면 대부분 드라이버 없이 잡힙니다.</li>
+                  <li>키보드가 있으면 좋은 이유는 연주가 아니라 <b>코드를 손으로 눌러보며 귀로 확인</b>할 수 있어서입니다.</li>
+                </ol>
+              </div></details>
+            </li>
+
+            <li>
+              <label><input type="checkbox" data-id="p3-4"><span class="box"></span><span class="txt">아무 소리나 넣고 <b>파일 내보내기까지</b> 한 번 성공 <em>· 여기서 막히는 사람이 많습니다</em></span></label>
+              <details class="how"><summary>어떻게</summary><div class="how-body">
+                <ol>
+                  <li>트랙에 4마디짜리 아무 음이나 찍습니다.</li>
+                  <li>내보낼 구간을 선택 (REAPER: 타임라인에서 드래그해 Time Selection 만들기).</li>
+                  <li><b>File → Render</b> → Bounds를 <code>Time selection</code>, 포맷은 <code>WAV</code> 또는 <code>MP3</code> → Render.</li>
+                  <li>나온 파일을 실제로 플레이어로 열어서 소리가 나는지 확인하세요.</li>
+                </ol>
+                <p class="stuck"><b>막히면</b> 빈 파일이 나오면 대개 Time selection이 없거나 트랙이 뮤트 상태입니다. 이 두 가지부터 확인하세요.</p>
+              </div></details>
+            </li>
+
+          </ul>
+        </div>
+
+        <div class="block">
+          <div class="bk-head"><span class="chip music">작곡</span><h3>3-2 · 리듬</h3><span class="bk-when lat">3주</span></div>
+          <p class="bk-note">멜로디부터 시작하면 십중팔구 막힙니다. 드럼이 곡의 뼈대입니다.</p>
+          <ul class="list" data-phase="p3">
+
+            <li>
+              <label><input type="checkbox" data-id="p3-5"><span class="box"></span><span class="txt">킥·스네어·하이햇만으로 <b>8마디 드럼 루프 10개</b></span></label>
+              <details class="how"><summary>어떻게</summary><div class="how-body">
+                <ol>
+                  <li>기본형부터: <b>킥은 1박과 3박, 스네어는 2박과 4박, 하이햇은 8분음표로 계속.</b> 이게 대부분 게임 음악의 뼈대입니다.</li>
+                  <li>기본형을 만든 뒤 <b>한 번에 하나씩만</b> 바꾸세요 — 킥을 한 개 더 넣기, 하이햇을 16분으로, 스네어를 한 박 밀기.</li>
+                  <li>10개를 각각 다른 파일로 저장. 나중에 곡의 시작점으로 재활용합니다.</li>
+                  <li>하루 1개, 10일.</li>
+                </ol>
+                <p class="stuck"><b>막히면</b> 드럼이 심심하게 느껴져도 채우지 마세요. 게임 BGM은 몇 시간을 반복해 들어야 해서, 화려한 드럼이 오히려 금방 질립니다.</p>
+              </div></details>
+            </li>
+
+            <li>
+              <label><input type="checkbox" data-id="p3-6"><span class="box"></span><span class="txt">좋아하는 게임 BGM <b>3곡의 드럼만</b> 귀로 따서 재현</span></label>
+              <details class="how"><summary>어떻게</summary><div class="how-body">
+                <ol>
+                  <li>곡을 DAW에 오디오로 불러오고 그 위에 트랙을 얹어 맞춰 찍으세요.</li>
+                  <li>먼저 <b>템포를 맞추는 것</b>부터. 킥이 그리드에 딱 붙으면 성공입니다.</li>
+                  <li>킥 → 스네어 → 하이햇 순으로 하나씩. 한 번에 다 들으려 하지 말고 <b>한 악기만 골라 듣기.</b></li>
+                  <li>못 딴 부분은 비워두고 넘어가세요. 정확도가 아니라 귀 훈련이 목적입니다.</li>
+                </ol>
+              </div></details>
+            </li>
+
+            <li>
+              <label><input type="checkbox" data-id="p3-7"><span class="box"></span><span class="txt">같은 패턴을 <b>템포 3가지</b>로 듣고 차이 기록</span></label>
+              <details class="how"><summary>어떻게</summary><div class="how-body">
+                <ol>
+                  <li>드럼 루프 하나를 <code>80 / 120 / 160 BPM</code>으로 재생해보세요.</li>
+                  <li>메모에 각각의 인상을 한 줄씩: "80은 무겁고 던전, 120은 평범한 마을, 160은 쫓기는 느낌".</li>
+                  <li>이 표가 나중에 <b>어떤 장면에 어떤 템포를 쓸지</b>의 기준이 됩니다.</li>
+                </ol>
+              </div></details>
+            </li>
+
+          </ul>
+        </div>
+
+        <div class="block">
+          <div class="bk-head"><span class="chip music">작곡</span><h3>3-3 · 코드</h3><span class="bk-when lat">4주</span></div>
+          <p class="bk-note">한 조성에서 쓰는 7개 코드(다이어토닉 코드)만 알면 게임 음악의 대부분이 설명됩니다.</p>
+          <ul class="list" data-phase="p3">
+
+            <li>
+              <label><input type="checkbox" data-id="p3-8"><span class="box"></span><span class="txt"><b>다이어토닉 7코드</b> 외우기 <em>· C조 기준 C·Dm·Em·F·G·Am·Bdim</em></span></label>
+              <details class="how"><summary>어떻게</summary><div class="how-body">
+                <ol>
+                  <li>규칙만 알면 외울 게 없습니다. 메이저 스케일은 반음 간격이 <code>2-2-1-2-2-2-1</code>이고, 각 음 위에 <b>한 칸 건너뛰며 3개</b>를 쌓으면 그 조의 7코드가 나옵니다.</li>
+                  <li>결과는 항상 같은 패턴입니다: <b>메이저 · 마이너 · 마이너 · 메이저 · 메이저 · 마이너 · 디미니시드</b>. 조가 바뀌어도 이 순서는 안 바뀝니다.</li>
+                  <li>DAW에서 C조 7코드를 전부 찍어놓고 한 번씩 들어보세요. 밝은 코드와 어두운 코드가 귀로 구분되면 됩니다.</li>
+                  <li>전공을 살리고 싶다면 이 패턴을 만드는 함수를 20줄쯤 짜보세요. 코드로 이해하면 안 잊습니다.</li>
+                </ol>
+              </div></details>
+            </li>
+
+            <li>
+              <label><input type="checkbox" data-id="p3-9"><span class="box"></span><span class="txt"><b>Hooktheory</b>에서 게임 BGM 10곡 진행 확인하고 패턴 적기</span></label>
+              <details class="how"><summary>어떻게</summary><div class="how-body">
+                <ol>
+                  <li><a href="https://www.hooktheory.com/theorytab">TheoryTab</a>에서 아는 게임 곡을 검색하세요. 코드 진행이 숫자로 표시됩니다.</li>
+                  <li>10곡의 진행을 메모에 나열하고, <b>반복되는 것</b>을 표시하세요. <code>I–V–vi–IV</code>, <code>vi–IV–I–V</code> 같은 게 계속 나올 겁니다.</li>
+                  <li>이 목록이 앞으로 쓸 재료입니다. 새로 발명하지 말고 <b>여기서 골라 쓰세요.</b></li>
+                </ol>
+              </div></details>
+            </li>
+
+            <li>
+              <label><input type="checkbox" data-id="p3-10"><span class="box"></span><span class="txt"><b>4코드 루프 20개</b> 만들기 <em>· 멜로디 없이 코드만</em></span></label>
+              <details class="how"><summary>어떻게</summary><div class="how-body">
+                <ol>
+                  <li>한 루프는 4마디, 코드 하나에 한 마디씩.</li>
+                  <li>앞서 정리한 진행 목록에서 골라 쓰되, <b>20개 중 절반은 그대로, 절반은 코드 하나만 바꿔서</b> 만드세요.</li>
+                  <li>악기는 피아노 하나로 고정. 음색을 고르는 데 시간을 쓰지 마세요.</li>
+                  <li>하루 2개, 10일.</li>
+                </ol>
+                <p class="stuck"><b>막히면</b> 코드를 세 음 그대로 나란히 찍으면 딱딱하게 들립니다. 가운데 음을 한 옥타브 올리거나(자리바꿈) 베이스만 따로 빼면 훨씬 나아집니다.</p>
+              </div></details>
+            </li>
+
+            <li>
+              <label><input type="checkbox" data-id="p3-11"><span class="box"></span><span class="txt">같은 진행을 <b>메이저 / 마이너</b>로 바꿔 각각 저장 <em>· 마을 ↔ 던전</em></span></label>
+              <details class="how"><summary>어떻게</summary><div class="how-body">
+                <ol>
+                  <li>가장 마음에 드는 루프 3개를 고릅니다.</li>
+                  <li>같은 자리의 코드를 <b>나란한 단조</b>로 옮기세요 (C조 → Am조). 음은 그대로 두고 시작 코드만 바꿔도 분위기가 뒤집힙니다.</li>
+                  <li>메이저·마이너 버전을 같은 이름 <code>-major</code> / <code>-minor</code>로 저장. 이게 3-4의 레이어링 재료가 됩니다.</li>
+                </ol>
+              </div></details>
+            </li>
+
+          </ul>
+        </div>
+
+        <div class="block">
+          <div class="bk-head"><span class="chip music">작곡</span><h3>3-4 · 멜로디와 루프</h3><span class="bk-when lat">6주</span></div>
+          <p class="bk-note">루프 이음새와 레이어링은 일반 작곡 강의에 잘 안 나오는데, 게임 음악에서는 이게 핵심입니다.</p>
+          <ul class="list" data-phase="p3">
+
+            <li>
+              <label><input type="checkbox" data-id="p3-12"><span class="box"></span><span class="txt">코드 루프 위에 <b>멜로디 얹기 10개</b></span></label>
+              <details class="how"><summary>어떻게</summary><div class="how-body">
+                <ol>
+                  <li>규칙 하나만: <b>각 마디의 첫 음은 그 마디 코드에 들어 있는 음</b>으로. 나머지는 비교적 자유롭습니다.</li>
+                  <li>음을 촘촘히 채우지 말고 <b>쉼표를 넣으세요.</b> 초보 멜로디가 답답한 건 대개 쉬지 않아서입니다.</li>
+                  <li>4마디를 만들고 <b>그대로 한 번 반복</b>하되 마지막 두 음만 바꾸세요. 그게 8마디 멜로디입니다.</li>
+                  <li>하루 1개, 10일.</li>
+                </ol>
+              </div></details>
+            </li>
+
+            <li>
+              <label><input type="checkbox" data-id="p3-13"><span class="box"></span><span class="txt"><b>30초 BGM 완성 5곡</b> <em>· 완성 = 내보내기까지</em></span></label>
+              <details class="how"><summary>어떻게</summary><div class="how-body">
+                <ol>
+                  <li>구성은 이렇게 고정하세요: <b>드럼 + 베이스 + 코드 + 멜로디</b>, 네 트랙.</li>
+                  <li>베이스는 각 마디 코드의 <b>가장 낮은 음 하나</b>만 길게. 이것만으로 곡이 훨씬 단단해집니다.</li>
+                  <li>볼륨 순서: 드럼과 베이스를 크게, 코드를 작게, 멜로디를 그 중간. 코드가 크면 탁해집니다.</li>
+                  <li>WAV로 내보내서 레포에 커밋. 미완성이어도 내보낸 것만 셉니다.</li>
+                </ol>
+                <p class="stuck"><b>막히면</b> 곡이 심심하면 악기를 더하지 말고 <b>빼세요.</b> 게임 BGM은 화면 뒤에 깔리는 소리라 비어 있는 편이 낫습니다.</p>
+              </div></details>
+            </li>
+
+            <li>
+              <label><input type="checkbox" data-id="p3-14"><span class="box"></span><span class="txt"><b>루프 이음새</b> 다듬기 — 끝에서 처음으로 돌아갈 때 티 안 나게</span></label>
+              <details class="how"><summary>어떻게</summary><div class="how-body">
+                <ol>
+                  <li>마지막 마디의 코드를 <b>V(도미넌트)</b>로 두면 첫 코드로 자연스럽게 이어집니다.</li>
+                  <li>내보낼 때 <b>정확히 마디 경계에서</b> 자르세요. 반 박자만 어긋나도 반복할 때 걸리는 느낌이 납니다.</li>
+                  <li>리버브 꼬리가 잘리면 뚝 끊깁니다. 곡 끝에서 리버브를 줄이거나, 꼬리를 곡 앞부분에 겹쳐 넣으세요.</li>
+                  <li>실제로 <b>5번 이상 반복 재생</b>해서 확인. 한 번 들어서는 안 들립니다.</li>
+                </ol>
+              </div></details>
+            </li>
+
+            <li>
+              <label><input type="checkbox" data-id="p3-15"><span class="box"></span><span class="txt"><b>레이어링</b> — 같은 곡의 “평상시 / 전투” 두 버전</span></label>
+              <details class="how"><summary>어떻게</summary><div class="how-body">
+                <ol>
+                  <li>3-13에서 만든 곡 하나를 고르고, <b>트랙 구성은 그대로</b> 둡니다.</li>
+                  <li>평상시 버전: 드럼과 리드를 <b>끔</b>. 코드와 베이스만.</li>
+                  <li>전투 버전: 전부 <b>켬</b>. 여기서 음을 새로 쓰지 마세요 — 켜고 끄는 것만으로 만드는 게 요령입니다.</li>
+                  <li>두 버전을 같은 길이·같은 템포로 내보내면, 게임에서 <b>재생 위치를 유지한 채</b> 교체할 수 있습니다. 이게 4-2의 오디오 매니저가 하는 일입니다.</li>
+                </ol>
+                <p class="stuck"><b>막히면</b> 두 파일의 길이가 1샘플이라도 다르면 전환할 때 어긋납니다. 반드시 같은 구간을 내보내세요.</p>
+              </div></details>
+            </li>
+
+            <li>
+              <label><input type="checkbox" data-id="p3-16"><span class="box"></span><span class="txt">게임 BGM <b>3곡 모작</b> — 귀로 듣고 MIDI로 재현</span></label>
+              <details class="how"><summary>어떻게</summary><div class="how-body">
+                <ol>
+                  <li>구조가 단순한 곡을 고르세요. 8비트·16비트 시대 곡이 배우기 좋습니다.</li>
+                  <li>순서: 드럼 → 베이스 → 코드 → 멜로디. <b>베이스를 먼저 따면</b> 코드가 저절로 보입니다.</li>
+                  <li>딴 뒤에 <a href="https://www.youtube.com/@8bitMusicTheory">8-bit Music Theory</a>에 그 곡 분석 영상이 있는지 찾아보세요. 내 귀와 남의 분석을 대조하는 게 가장 빠른 학습입니다.</li>
+                  <li>모작은 연습용입니다. 게임에 쓰지 마세요.</li>
+                </ol>
+              </div></details>
+            </li>
+
+          </ul>
+          <p class="done"><strong>완료 기준</strong> <span>게임에 넣어도 되는 30초~1분 루프 BGM 3곡, 그리고 레이어 분기 버전 1곡.</span></p>
+        </div>
+      </section>
+
+      <!-- ================= PHASE 4 ================= -->
+      <section class="phase" id="p4">
+        <div class="ph-head">
+          <div class="ph-no lat">04</div>
+          <div class="ph-title">
+            <h2>통합, 그리고 전공 살리기</h2>
+            <p class="ph-when lat">Month 9–12</p>
+          </div>
+        </div>
+        <p class="ph-goal">여기서부터는 손기술이 아니라 코드로 격차를 메웁니다.
+          단순한 스프라이트 하나도 셰이더로 아웃라인·피격 플래시를 넣으면 화면이 훨씬 좋아 보입니다.
+          그림을 더 잘 그리는 것보다 <b>이쪽이 투자 대비 효과가 큽니다.</b></p>
+        <div class="ph-meter"><div class="px sm" data-px="p4"></div><span class="ph-frac lat" data-frac="p4"></span></div>
+
+        <div class="block">
+          <div class="bk-head"><span class="chip core">코드</span><h3>4-1 · 전공으로 메우기</h3></div>
+          <ul class="list" data-phase="p4">
+
+            <li>
+              <label><input type="checkbox" data-id="p4-1"><span class="box"></span><span class="txt"><b>셰이더 1개</b> — 피격 플래시 또는 아웃라인</span></label>
+              <details class="how"><summary>어떻게</summary><div class="how-body">
+                <ol>
+                  <li><b>피격 플래시</b>부터 하세요. 프래그먼트 셰이더에서 원래 색을 흰색과 섞고, 그 섞는 비율을 스크립트에서 0.1초 동안 1 → 0으로 되돌리면 끝입니다. 10줄이면 됩니다.</li>
+                  <li><b>아웃라인</b>은 그다음. 각 픽셀에서 상하좌우 네 칸을 샘플링해, 자기가 투명한데 이웃이 불투명하면 외곽선 색을 칠합니다.</li>
+                  <li>엔진마다 문법이 다르니 쓰는 엔진 이름 + <code>sprite flash shader</code>로 검색하세요. 개념은 위 두 줄이 전부입니다.</li>
+                  <li>적용 전/후 GIF를 나란히 찍어두세요. 4-2 블로그 글에서 가장 반응이 좋은 자료가 됩니다.</li>
+                </ol>
+                <p class="stuck"><b>막히면</b> 피격 플래시 하나만으로도 화면 인상이 눈에 띄게 달라집니다. 여기서 그만둬도 본전은 뽑습니다.</p>
+              </div></details>
+            </li>
+
+            <li>
+              <label><input type="checkbox" data-id="p4-2"><span class="box"></span><span class="txt"><b>오디오 매니저</b> — 상황에 따라 트랙을 켜고 끄며 곡 분기</span></label>
+              <details class="how"><summary>어떻게</summary><div class="how-body">
+                <ol>
+                  <li>3-15에서 만든 두 버전을 <b>동시에 재생</b>하되, 한쪽 볼륨을 0으로 두는 방식이 가장 간단합니다. 재생 위치가 저절로 맞습니다.</li>
+                  <li>전환은 즉시 바꾸지 말고 <b>0.5초에 걸쳐 볼륨을 교차</b>시키세요. 뚝 끊기면 싸구려로 들립니다.</li>
+                  <li>API는 세 개면 충분합니다: <code>play(track)</code> · <code>setLayer(name, on)</code> · <code>fadeTo(state, seconds)</code>.</li>
+                  <li>전투 진입/이탈에 붙여서 실제로 동작하는지 확인.</li>
+                </ol>
+              </div></details>
+            </li>
+
+            <li>
+              <label><input type="checkbox" data-id="p4-3"><span class="box"></span><span class="txt"><b>팔레트 스왑 스크립트</b> — 색만 바꿔 적 캐릭터 변형 생성</span></label>
+              <details class="how"><summary>어떻게</summary><div class="how-body">
+                <ol>
+                  <li>1-12에서 만들어둔 <b>색 대응표</b>를 JSON으로 옮기세요. <code>{"#a05030": "#3050a0", ...}</code> 형태면 됩니다.</li>
+                  <li>PNG를 읽어 픽셀을 순회하며 표에 있는 색을 치환하고 저장하는 스크립트 — 파이썬 <code>Pillow</code>로 30줄이면 끝납니다.</li>
+                  <li>스프라이트 1종 × 팔레트 4개 = 적 4종. <b>이게 픽셀아트에서 전공자가 가장 크게 이기는 지점입니다.</b></li>
+                  <li>런타임에 셰이더로 하는 방법도 있지만, 먼저 스크립트로 파일을 뽑는 쪽이 단순합니다.</li>
+                </ol>
+              </div></details>
+            </li>
+
+            <li>
+              <label><input type="checkbox" data-id="p4-4"><span class="box"></span><span class="txt">스프라이트 <b>아틀라스 자동 패킹</b> 파이프라인</span></label>
+              <details class="how"><summary>어떻게</summary><div class="how-body">
+                <ol>
+                  <li>폴더의 PNG들을 한 장으로 합치고 좌표를 JSON으로 뽑는 스크립트를 짜세요. 정렬은 높이 내림차순 후 채워넣기(간단한 bin packing)면 충분합니다.</li>
+                  <li>커밋할 때 자동으로 돌게 하려면 git hook이나 간단한 <code>make</code> 타깃으로 걸어두기.</li>
+                  <li>목적은 성능이 아니라 <b>손으로 하는 반복 작업 제거</b>입니다. 스프라이트 하나 추가할 때 손이 안 가야 계속 그리게 됩니다.</li>
+                </ol>
+              </div></details>
+            </li>
+
+          </ul>
+        </div>
+
+        <div class="block">
+          <div class="bk-head"><span class="chip art">미술</span><span class="chip music">작곡</span><span class="chip core">출하</span><h3>4-2 · 전부 직접 만든 게임 하나</h3></div>
+          <ul class="list" data-phase="p4">
+
+            <li>
+              <label><input type="checkbox" data-id="p4-5"><span class="box"></span><span class="txt">아트 + 음악 <b>전부 직접</b> 만든 게임 1개 <em>· 플레이 30분 분량이면 충분</em></span></label>
+              <details class="how"><summary>어떻게</summary><div class="how-body">
+                <ol>
+                  <li>범위를 먼저 못박으세요: <b>스테이지 3개 · 적 3종 · BGM 2곡 · 효과음 8개.</b> 이 숫자를 넘기지 않습니다.</li>
+                  <li>효과음은 <a href="https://sfxr.me/">sfxr</a> 같은 생성기로 만들면 30분이면 8개가 나옵니다. 여기에 시간 쓰지 마세요.</li>
+                  <li>순서는 <b>코드 → 아트 → 음악</b>. 음악을 먼저 만들면 게임이 안 나옵니다.</li>
+                  <li>2~3개월 안에 끝내세요. 늘어지면 안 끝납니다.</li>
+                </ol>
+              </div></details>
+            </li>
+
+            <li>
+              <label><input type="checkbox" data-id="p4-6"><span class="box"></span><span class="txt">두 번째 게임잼 — <b>이번엔 음악까지 직접</b></span></label>
+              <details class="how"><summary>어떻게</summary><div class="how-body">
+                <ol>
+                  <li>잼 시간표에 <b>음악 3시간</b>을 미리 넣으세요. 안 넣으면 마지막에 잘려나갑니다.</li>
+                  <li>3-13에서 만든 곡 중 하나를 <b>그대로 재활용해도 됩니다.</b> 잼에서 새로 만들 필요 없습니다.</li>
+                  <li>1년 전 첫 잼 결과와 나란히 놓고 비교하세요. 이 비교가 이 로드맵의 결과물입니다.</li>
+                </ol>
+              </div></details>
+            </li>
+
+            <li>
+              <label><input type="checkbox" data-id="p4-7"><span class="box"></span><span class="txt">작업 과정 글 <b>1편</b> 쓰기 <em>· 결과물보다 과정 기록이 포트폴리오가 됩니다</em></span></label>
+              <details class="how"><summary>어떻게</summary><div class="how-body">
+                <ol>
+                  <li>주제는 <b>하나만</b> 고르세요. "픽셀아트 1년 회고"보다 "피격 플래시 셰이더 10줄로 타격감 만들기"가 훨씬 잘 읽힙니다.</li>
+                  <li>구성: 문제 → 시도한 것 → 안 된 것 → 된 것 → 코드/GIF.</li>
+                  <li><b>실패한 시도를 반드시 넣으세요.</b> 그게 글의 값어치입니다.</li>
+                  <li>블로그와 GitHub 레포 양쪽에 올리고 서로 링크를 겁니다.</li>
+                </ol>
+              </div></details>
+            </li>
+
+            <li>
+              <label><input type="checkbox" data-id="p4-8"><span class="box"></span><span class="txt">1년치 결과물을 <b>한 페이지로</b> 정리 — 첫 스프라이트와 마지막 스프라이트를 나란히</span></label>
+              <details class="how"><summary>어떻게</summary><div class="how-body">
+                <ol>
+                  <li>레포에서 첫 달 폴더와 마지막 달 폴더를 열어, 같은 대상(예: 검)을 그린 것 두 개를 나란히 놓으세요.</li>
+                  <li>월별 대표작 12개를 격자로 배치한 이미지 한 장을 만들기.</li>
+                  <li>이 한 장이 어떤 이력서보다 설득력 있습니다. 블로그 글의 대표 이미지로 쓰세요.</li>
+                </ol>
+              </div></details>
+            </li>
+
+          </ul>
+          <p class="done"><strong>완료 기준</strong> <span>itch.io에 아트·음악 전부 본인 크레딧인 게임 1개, 그리고 그 과정을 설명한 글 1편.</span></p>
+        </div>
+      </section>
+
+      <!-- ================= ROUTINE ================= -->
+      <section class="tail">
+        <h2>주기별로 할 것</h2>
+        <p class="sub">단계와 무관하게 12개월 내내 유지하는 리듬입니다.</p>
+        <div class="tablewrap">
+          <table>
+            <thead><tr><th>주기</th><th>할 것</th><th>왜</th></tr></thead>
+            <tbody>
+              <tr><td>매일</td><td>30분, 같은 시간</td><td>실력은 총 시간이 아니라 반복한 날짜 수를 따라갑니다</td></tr>
+              <tr><td>주 1회</td><td>완성작 1개 — 스프라이트 1장 또는 8마디 루프 1개</td><td>미완성은 실력이 되지 않습니다</td></tr>
+              <tr><td>월 1회</td><td>이번 달 결과물을 한 장에 모아 보기</td><td>매일 보면 안 느는 것 같지만 한 달 단위로는 확실히 보입니다</td></tr>
+              <tr><td>3개월마다</td><td>게임잼 참가</td><td>마감이 완벽주의를 없애고, 실제로 돌아가는 결과물이 남습니다</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ================= TRAPS ================= -->
+      <section class="tail">
+        <h2>실패하는 세 가지 방식</h2>
+        <p class="sub">거의 모든 중도 포기가 이 셋 중 하나입니다.</p>
+        <div class="traps">
+          <article><div class="tno lat">01</div><div>
+            <h3>강의만 보고 안 만든다</h3>
+            <p>튜토리얼은 이해가 되니까 늘고 있다는 착각을 줍니다. 강의 1개를 봤으면 반드시 결과물 1개를 만드세요. 안 만들었으면 그 강의는 본 게 아닙니다.</p>
+          </div></article>
+          <article><div class="tno lat">02</div><div>
+            <h3>처음부터 잘하려 한다</h3>
+            <p>첫 100장은 못 그리는 게 정상입니다. 목표는 잘 그리는 게 아니라 그 100장을 빨리 소진하는 것입니다. 음악도 첫 50곡은 버리는 곡입니다.</p>
+          </div></article>
+          <article><div class="tno lat">03</div><div>
+            <h3>둘을 동시에 한다</h3>
+            <p>하루 30분을 그림 15분 + 음악 15분으로 쪼개면 둘 다 안 늡니다. 이 로드맵이 그림 4개월, 음악 4개월로 나눠 놓은 이유입니다.</p>
+          </div></article>
+        </div>
+      </section>
+
+      <!-- ================= LINKS ================= -->
+      <section class="tail">
+        <h2>자료</h2>
+        <p class="sub">더 찾지 말고 이것만 보세요. 자료를 모으는 것도 미루기의 한 형태입니다.</p>
+        <div class="links">
+          <div>
+            <h3 class="lat">Pixel Art</h3>
+            <ul>
+              <li><a href="https://lospec.com/palette-list">Lospec 팔레트 목록</a><span>검증된 제한 팔레트. 직접 만들지 말 것</span></li>
+              <li><a href="https://www.youtube.com/@MortMort">MortMort</a><span>픽셀아트 기초를 가장 체계적으로 설명</span></li>
+              <li><a href="https://www.youtube.com/@BJGpixel">Brandon James Greer</a><span>색과 명암 판단 과정을 보여줌</span></li>
+              <li><a href="https://www.youtube.com/@AdamCYounis">Adam C. Younis</a><span>게임에 실제로 넣는 관점</span></li>
+            </ul>
+          </div>
+          <div>
+            <h3 class="lat">Music</h3>
+            <ul>
+              <li><a href="https://www.youtube.com/@8bitMusicTheory">8-bit Music Theory</a><span>실제 게임 BGM을 뜯어서 왜 그 코드인지 분석. 이 목적에 가장 정확히 맞음</span></li>
+              <li><a href="https://www.youtube.com/@SignalsMusicStudio">Signals Music Studio</a><span>기초 이론을 실용적으로</span></li>
+              <li><a href="https://www.hooktheory.com/theorytab">Hooktheory TheoryTab</a><span>실제 곡의 코드 진행 데이터베이스</span></li>
+              <li><a href="https://labs.spitfireaudio.com/">Spitfire LABS</a><span>무료 음원, 퀄리티 좋음</span></li>
+            </ul>
+          </div>
+          <div>
+            <h3 class="lat">Ship It</h3>
+            <ul>
+              <li><a href="https://ldjam.com/">Ludum Dare</a><span>연 2회, 48시간 / 72시간</span></li>
+              <li><a href="https://itch.io/jams">itch.io 게임잼 목록</a><span>규모별로 상시 열림</span></li>
+              <li><a href="https://sfxr.me/">sfxr</a><span>효과음 생성기. 8비트 효과음이 몇 초 만에 나옴</span></li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <footer class="bot">
+        <p>체크 상태는 이 브라우저에만 저장됩니다 — 서버로 전송되지 않고, 다른 기기에서는 보이지 않습니다.</p>
+        <button class="reset" id="reset" type="button">진행 상황 초기화</button>
+      </footer>
+
+    </main>
+  </div>
+</div>
+
+<script>
+(function(){
+  var KEY = "sprite-loop-progress-v1";
+  var boxes = Array.prototype.slice.call(document.querySelectorAll('input[type=checkbox][data-id]'));
+  var phases = [
+    {id:"p0", no:"00", name:"세팅", when:"1주"},
+    {id:"p1", no:"01", name:"픽셀아트 기초", when:"1–3개월"},
+    {id:"p2", no:"02", name:"첫 출하", when:"4개월"},
+    {id:"p3", no:"03", name:"작곡 기초", when:"5–8개월"},
+    {id:"p4", no:"04", name:"통합", when:"9–12개월"}
+  ];
+
+  function load(){
+    try{ return JSON.parse(localStorage.getItem(KEY) || "{}") || {}; }
+    catch(e){ return {}; }
+  }
+  function save(state){
+    try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){}
+  }
+
+  // ---- rail ----
+  var rail = document.getElementById('rail-list');
+  phases.forEach(function(p){
+    var li = document.createElement('li');
+    li.setAttribute('data-rail-li', p.id);
+    li.innerHTML =
+      '<a href="#'+p.id+'">'+
+        '<span class="rl-top"><span class="rl-no lat">'+p.no+'</span>'+
+        '<span class="rl-name">'+p.name+'</span>'+
+        '<span class="rl-when lat">'+p.when+'</span></span>'+
+        '<span class="px sm" data-rail="'+p.id+'"></span>'+
+      '</a>';
+    rail.appendChild(li);
+  });
+
+  function blocks(el, total, done){
+    if(!el) return;
+    if(el.childElementCount !== total){
+      el.textContent = "";
+      for(var i=0;i<total;i++){ el.appendChild(document.createElement('i')); }
+    }
+    for(var j=0;j<total;j++){
+      el.children[j].className = j < done ? "on" : "";
+    }
+  }
+
+  // ---- NOW card ----
+  var nowEl   = document.getElementById('now');
+  var nowWhere= document.getElementById('now-where');
+  var nowTitle= document.getElementById('now-title');
+  var nowBody = document.getElementById('now-body');
+  var nowBtn  = document.getElementById('now-done');
+  var nowJump = document.getElementById('now-jump');
+  var currentId = null;
+
+  function whereOf(box){
+    var block = box.closest('.block');
+    var phase = box.closest('.phase');
+    var h3 = block ? block.querySelector('h3') : null;
+    var h2 = phase ? phase.querySelector('h2') : null;
+    var parts = [];
+    if(h2) parts.push(h2.textContent.trim());
+    if(h3) parts.push(h3.textContent.trim());
+    return parts.join(" · ");
+  }
+
+  function renderNow(){
+    var next = null;
+    for(var i=0;i<boxes.length;i++){ if(!boxes[i].checked){ next = boxes[i]; break; } }
+
+    document.querySelectorAll('li.now-here').forEach(function(li){ li.classList.remove('now-here'); });
+    document.querySelectorAll('li[data-rail-li]').forEach(function(li){ li.classList.remove('here'); });
+
+    if(!next){
+      currentId = null;
+      nowEl.classList.add('done-all');
+      nowWhere.textContent = "";
+      nowTitle.textContent = "12개월 전부 완료했습니다.";
+      nowBody.innerHTML = '<p style="margin:0">첫 달 폴더와 마지막 달 폴더를 나란히 열어보세요. 그게 이 로드맵의 결과입니다.</p>';
+      nowBtn.hidden = true;
+      nowJump.hidden = true;
+      return;
+    }
+
+    nowEl.classList.remove('done-all');
+    nowBtn.hidden = false;
+    nowJump.hidden = false;
+    currentId = next.dataset.id;
+
+    var li = next.closest('li');
+    li.classList.add('now-here');
+    var phase = next.closest('.phase');
+    var railLi = document.querySelector('li[data-rail-li="'+phase.id+'"]');
+    if(railLi) railLi.classList.add('here');
+
+    nowWhere.textContent = whereOf(next);
+    var txt = li.querySelector('.txt');
+    nowTitle.innerHTML = txt ? txt.innerHTML : "";
+    var how = li.querySelector('.how-body');
+    nowBody.innerHTML = how ? how.innerHTML : "";
+    nowJump.setAttribute('href', '#' + phase.id);
+  }
+
+  nowBtn.addEventListener('click', function(){
+    if(!currentId) return;
+    var box = document.querySelector('input[data-id="'+currentId+'"]');
+    if(!box) return;
+    box.checked = true;
+    var state = load();
+    state[currentId] = 1;
+    save(state);
+    render();
+  });
+
+  function render(){
+    var state = load();
+    var totalDone = 0;
+    boxes.forEach(function(b){
+      b.checked = !!state[b.dataset.id];
+      if(b.checked) totalDone++;
+    });
+
+    phases.forEach(function(p){
+      var section = document.getElementById(p.id);
+      var items = section.querySelectorAll('input[type=checkbox][data-id]');
+      var done = 0;
+      Array.prototype.forEach.call(items, function(b){ if(b.checked) done++; });
+      blocks(section.querySelector('[data-px="'+p.id+'"]'), items.length, done);
+      blocks(document.querySelector('[data-rail="'+p.id+'"]'), items.length, done);
+      var frac = section.querySelector('[data-frac="'+p.id+'"]');
+      if(frac) frac.textContent = done + " / " + items.length;
+    });
+
+    blocks(document.getElementById('total-px'), boxes.length, totalDone);
+    document.getElementById('total-count').innerHTML =
+      totalDone + '<small> / ' + boxes.length + ' 완료</small>';
+
+    renderNow();
+  }
+
+  boxes.forEach(function(b){
+    b.addEventListener('change', function(){
+      var state = load();
+      if(b.checked){ state[b.dataset.id] = 1; } else { delete state[b.dataset.id]; }
+      save(state);
+      render();
+    });
+  });
+
+  document.getElementById('reset').addEventListener('click', function(){
+    if(!window.confirm('체크한 항목을 모두 지웁니다. 계속할까요?')) return;
+    save({});
+    render();
+  });
+
+  render();
+})();
+</script>
+
+</html>
