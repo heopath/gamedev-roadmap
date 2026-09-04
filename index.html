@@ -131,6 +131,12 @@
   }
   .meter .count small{font-size:.9rem;font-weight:600;color:var(--muted)}
   .meter .note{font-size:.82rem;color:var(--muted)}
+  .sync{display:inline-flex;align-items:center;gap:8px;font-size:.82rem;color:var(--muted)}
+  .sync i{width:7px;height:7px;background:var(--muted);display:block;flex:none}
+  .sync[data-mode="on"]{color:var(--art)}
+  .sync[data-mode="on"] i{background:var(--art)}
+  .sync[data-mode="err"]{color:var(--music)}
+  .sync[data-mode="err"] i{background:var(--music)}
 
   /* ---------- pixel progress ---------- */
   .px{display:flex;flex-wrap:wrap;gap:3px;margin:14px 0 0}
@@ -384,7 +390,7 @@
         <span class="count lat" id="total-count">0<small> / 0 완료</small></span>
         <div class="px" id="total-px"></div>
       </div>
-      <span class="note">체크 상태는 이 브라우저에만 저장됩니다.</span>
+      <span class="sync" id="sync" data-mode="local"><i></i><span id="sync-text">이 브라우저에 저장 중</span></span>
     </div>
 
     <div class="now" id="now">
@@ -1285,7 +1291,7 @@
       </section>
 
       <footer class="bot">
-        <p>체크 상태는 이 브라우저에만 저장됩니다 — 서버로 전송되지 않고, 다른 기기에서는 보이지 않습니다.</p>
+        <p id="storage-note">진행 상황을 저장하는 중입니다.</p>
         <button class="reset" id="reset" type="button">진행 상황 초기화</button>
       </footer>
 
@@ -1305,12 +1311,59 @@
     {id:"p4", no:"04", name:"통합", when:"9–12개월"}
   ];
 
+  // ---- 저장 ----
+  // 화면은 항상 로컬 사본으로 즉시 그리고, 동기화가 붙으면 그 위에 얹는다.
+  var mem = null;
+  var docRef = null;          // 동기화 가능할 때만 채워짐
+  var pushTimer = null;
+
   function load(){
-    try{ return JSON.parse(localStorage.getItem(KEY) || "{}") || {}; }
-    catch(e){ return {}; }
+    if(mem) return mem;
+    try{ mem = JSON.parse(localStorage.getItem(KEY) || "{}") || {}; }
+    catch(e){ mem = {}; }
+    return mem;
   }
-  function save(state){
-    try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){}
+  function saveLocal(){
+    try{ localStorage.setItem(KEY, JSON.stringify(mem || {})); }catch(e){}
+  }
+  function save(next){
+    mem = next || {};
+    saveLocal();
+    schedulePush();
+  }
+  function schedulePush(){
+    if(!docRef) return;
+    if(pushTimer) clearTimeout(pushTimer);
+    pushTimer = setTimeout(pushRemote, 400);   // 연속 체크는 한 번으로 묶는다
+  }
+  function pushRemote(){
+    if(!docRef) return;
+    docRef.set({ items: mem || {}, updatedAt: new Date().toISOString() })
+      .then(function(){ setSync("on", "기기 간 동기화 중"); })
+      .catch(function(e){
+        setSync("err", e && e.code === "resource_exhausted"
+          ? "동기화 잠시 지연 — 이 브라우저에는 저장됨"
+          : "동기화 실패 — 이 브라우저에는 저장됨");
+      });
+  }
+  function adoptRemote(items){
+    mem = items || {};
+    saveLocal();
+    render();
+  }
+
+  var syncEl = document.getElementById('sync');
+  var syncText = document.getElementById('sync-text');
+  var storageNote = document.getElementById('storage-note');
+  function setSync(mode, text){
+    syncEl.setAttribute('data-mode', mode);
+    syncText.textContent = text;
+    storageNote.textContent =
+      mode === "on"
+        ? "진행 상황이 계정에 저장돼 다른 기기에서도 이어집니다. 오프라인에서도 체크할 수 있고, 다시 연결되면 올라갑니다."
+        : mode === "err"
+          ? "동기화가 끊겨 이 브라우저에만 저장되고 있습니다. 새로고침하면 다시 시도합니다."
+          : "이 페이지는 진행 상황을 이 브라우저에만 저장합니다. 기기 간 동기화가 필요하면 Claude 아티팩트 버전을 쓰세요.";
   }
 
   // ---- rail ----
@@ -1449,6 +1502,48 @@
   });
 
   render();
+  setSync("local", "이 브라우저에 저장 중");
+
+  // ---- 기기 간 동기화 ----
+  // Claude 아티팩트로 열렸을 때만 붙는다. GitHub Pages에서는 window.claude 자체가 없어
+  // 아래 전체가 조용히 건너뛰어지고 로컬 저장만 남는다.
+  (function connect(){
+    var c = (typeof window !== "undefined") ? window.claude : null;
+    if(!c || typeof c.use !== "function") return;
+    var p;
+    try { p = c.use("db"); } catch(e){ return; }
+    if(!p || typeof p.then !== "function") return;
+
+    p.then(function(db){
+      if(!db) return;                        // 이 화면에서는 못 씀 — 로컬 그대로 둔다
+      var ref;
+      try { ref = db.doc("progress/checklist"); } catch(e){ return; }
+
+      var first = true;
+      ref.onSnapshot(function(snap){
+        if(first){
+          first = false;
+          docRef = ref;
+          if(!snap.exists){
+            // 아직 어느 기기도 올린 적 없음 — 지금 브라우저 진행 상황을 올려서 시작한다
+            if(Object.keys(load()).length){ pushRemote(); }
+            else { setSync("on", "기기 간 동기화 중"); }
+            return;
+          }
+        }
+        if(snap.exists){
+          var body = snap.data() || {};
+          adoptRemote(body.items || {});
+          setSync("on", "기기 간 동기화 중");
+        }
+      }, function(err){
+        docRef = null;
+        setSync("err", (err && err.code === "revoked")
+          ? "동기화 권한 해제됨 — 이 브라우저에만 저장"
+          : "동기화 끊김 — 이 브라우저에만 저장");
+      });
+    }).catch(function(){ /* 로컬 저장만 유지 */ });
+  })();
 })();
 </script>
 
